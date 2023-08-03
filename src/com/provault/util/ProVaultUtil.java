@@ -8,6 +8,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
+import java.util.Optional;
 
 public class ProVaultUtil {
 
@@ -20,35 +22,43 @@ public class ProVaultUtil {
         return key;
     }
 
-    public static void validateKey(File keyFile, String key) throws IOException {
-        if(!keyFile.exists()) {
-            if(!keyFile.createNewFile()) {
-                log("Error creating key file...");
-                System.exit(-1);
+    public static void validateKey(File keyFile, String key) {
+        try {
+            if (!keyFile.exists()) {
+                if (!keyFile.createNewFile()) {
+                    log("Error creating key file...");
+                    System.exit(-1);
+                }
+                BufferedWriter br = new BufferedWriter(new FileWriter(keyFile));
+                br.write(key);
+                br.close();
+                return;
             }
-            BufferedWriter br = new BufferedWriter(new FileWriter(keyFile));
-            br.write(key);
-            br.close();
-            return;
-        }
-        BufferedReader br = new BufferedReader(new FileReader(keyFile));
-        if(!key.startsWith(br.readLine())) {
-            log("Incorrect Password...");
-            System.exit(0);
+            BufferedReader br = new BufferedReader(new FileReader(keyFile));
+            if (!key.startsWith(br.readLine())) {
+                log("Incorrect Password...");
+                System.exit(0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public static void createPathIfMissing(File vaultFolder, File dataFile) throws IOException {
-        if(!vaultFolder.exists()) {
-            Files.createDirectory(vaultFolder.toPath());
-            log("Creating vault: " + Constant.VAULT_PATH);
-            System.exit(-1);
-        }
-        if(!dataFile.exists()) {
-            if(!dataFile.createNewFile()) {
-                log("Error creating data file...");
+    public static void createPathIfMissing(File vaultFolder, File dataFile) {
+        try {
+            if (!vaultFolder.exists()) {
+                Files.createDirectory(vaultFolder.toPath());
+                log("Creating vault: " + Constant.VAULT_PATH);
+                System.exit(-1);
             }
-            log("Creating data file.");
+            if (!dataFile.exists()) {
+                if (!dataFile.createNewFile()) {
+                    log("Error creating data file...");
+                }
+                log("Creating data file.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -62,10 +72,9 @@ public class ProVaultUtil {
         int option = JOptionPane.showOptionDialog(null, panel, text,
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
                 null, options, options[0]);
-        if(option == 0)
-        {
+        if (option == 0) {
             char[] password = pass.getPassword();
-            if(password.length < 4)
+            if (password.length < 4)
                 System.exit(0);
 
             return new String(password);
@@ -74,12 +83,24 @@ public class ProVaultUtil {
         return "";
     }
 
-    public static String getHash(String key, String algorithm) throws NoSuchAlgorithmException {
-        MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
+    public static String getCategory(Object[] categories) {
+        JComboBox<Object> comboBox = new JComboBox<>(categories);
+        comboBox.setEditable(true);
+        JOptionPane.showMessageDialog(null, comboBox, "Category", JOptionPane.QUESTION_MESSAGE);
+        return (String) comboBox.getSelectedItem();
+    }
+
+    public static String getHash(String key, String algorithm) {
+        MessageDigest messageDigest = null;
+        try {
+            messageDigest = MessageDigest.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
         messageDigest.update(key.getBytes());
         return new String(messageDigest.digest());
     }
-    
+
     public static void log(String logText) {
         System.out.println(logText);
     }

@@ -13,4 +13,8 @@ public class VaultData {
     public void setFiles(List<VaultFile> files) {
         this.files = files;
     }
+
+    public Object[] getCategories() {
+        return files.stream().map(VaultFile::getCategory).distinct().toArray();
+    }
 }

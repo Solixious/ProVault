@@ -5,12 +5,8 @@ public class VaultFile {
     private String fileName;
     private String displayName;
     private String extension;
+    private String category;
     private boolean locked;
-
-    //@Override
-    public int compareTo(VaultFile o) {
-        return fileName.compareTo(o.getFileName());
-    }
 
     public String getFileName() {
         return fileName;
@@ -43,5 +39,13 @@ public class VaultFile {
 
     public void setExtension(String extension) {
         this.extension = extension;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getCategory() {
+        return category;
     }
 }

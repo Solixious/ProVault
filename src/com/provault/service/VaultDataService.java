@@ -13,21 +13,26 @@ public class VaultDataService {
     public static final String TRUE = "1";
     public static final String FALSE = "0";
 
-    public static VaultData generateVaultData() throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader(Constant.DATA_FILE));
-        VaultData vaultData = new VaultData();
-        List<VaultFile> files = new ArrayList<>();
-        vaultData.setFiles(files);
-        String data;
-        while((data = br.readLine()) != null) {
-            if(data == null || "".equals(data)) {
-                break;
+    public static VaultData generateVaultData() {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(Constant.DATA_FILE));
+            VaultData vaultData = new VaultData();
+            List<VaultFile> files = new ArrayList<>();
+            vaultData.setFiles(files);
+            String data;
+            while ((data = br.readLine()) != null) {
+                if ("".equals(data)) {
+                    break;
+                }
+                VaultFile vaultFile = getVaultFile(data);
+                files.add(vaultFile);
             }
-            VaultFile vaultFile = getVaultFile(data);
-            files.add(vaultFile);
+            files.sort(Comparator.comparing(VaultFile::getCategory).thenComparing(VaultFile::getDisplayName));
+            return vaultData;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        files.sort(Comparator.comparing(VaultFile::getDisplayName));
-        return vaultData;
+        return null;
     }
 
     public static void writeVaultData(VaultData vaultData) throws Exception {
@@ -47,6 +52,7 @@ public class VaultDataService {
         vaultFile.setDisplayName(dataArray[1]);
         vaultFile.setExtension(dataArray[2]);
         vaultFile.setLocked("1".equals(dataArray[3]));
+        vaultFile.setCategory(dataArray[4]);
         return vaultFile;
     }
 
@@ -54,6 +60,7 @@ public class VaultDataService {
         return vaultFile.getFileName() + SEPARATOR
                 + vaultFile.getDisplayName() + SEPARATOR
                 + vaultFile.getExtension() + SEPARATOR
-                + (vaultFile.isLocked() ? TRUE : FALSE);
+                + ((vaultFile.isLocked() ? TRUE : FALSE) + SEPARATOR)
+                + vaultFile.getCategory();
     }
 }

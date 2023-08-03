@@ -6,6 +6,7 @@ import com.provault.model.VaultData;
 import com.provault.model.VaultFile;
 import com.provault.service.FileEncryptionService;
 import com.provault.service.VaultDataService;
+import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -106,12 +107,13 @@ public class ProVaultFrame implements ActionListener {
         model.addColumn("Icon");
         model.addColumn("File Name");
         model.addColumn("Encrypted");
+        model.addColumn("Category");
         model.addColumn("File Size");
         model.addColumn("");
         for (VaultFile vaultFile : vaultFiles) {
             String fileName = getFileName(vaultFile);
             File vFile = new File(Constant.VAULT_PATH + fileName);
-            model.addRow(new Object[]{fileChooser.getUI().getFileView(fileChooser).getIcon(vFile), vaultFile.getDisplayName(), vaultFile.isLocked(), getStringSizeLengthFile(vFile.length()), vaultFile.getFileName()});
+            model.addRow(new Object[]{fileChooser.getUI().getFileView(fileChooser).getIcon(vFile), vaultFile.getDisplayName(), vaultFile.isLocked(), vaultFile.getCategory(), getStringSizeLengthFile(vFile.length()), vaultFile.getFileName()});
         }
         vaultFilesList = new JTable(model) {
             @Override
@@ -132,7 +134,7 @@ public class ProVaultFrame implements ActionListener {
                     if ((Boolean) model.getValueAt(row, 2)) {
                         return;
                     }
-                    VaultFile vaultFile = vaultFiles.stream().filter(e -> e.getFileName().equals(model.getValueAt(row, 4))).toList().get(0);
+                    VaultFile vaultFile = vaultFiles.stream().filter(e -> e.getFileName().equals(model.getValueAt(row, 5))).toList().get(0);
                     openFile(Constant.VAULT_PATH + vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
                 }
             }
@@ -142,14 +144,18 @@ public class ProVaultFrame implements ActionListener {
         vaultFilesList.getColumnModel().getColumn(0).setPreferredWidth(50);
         vaultFilesList.getColumnModel().getColumn(1).setPreferredWidth(300);
         vaultFilesList.getColumnModel().getColumn(2).setPreferredWidth(100);
-        vaultFilesList.getColumnModel().getColumn(4).setPreferredWidth(0);
+        vaultFilesList.getColumnModel().getColumn(3).setPreferredWidth(300);
+        vaultFilesList.getColumnModel().getColumn(4).setPreferredWidth(200);
+        vaultFilesList.getColumnModel().getColumn(5).setPreferredWidth(0);
         vaultFilesList.getTableHeader().setReorderingAllowed(false);
+        vaultFilesList.setRowHeight(30);
+        vaultFilesList.setFont(new Font("Serif", Font.PLAIN, 16));
         model.addTableModelListener(e -> {
             if (e.getFirstRow() >= model.getRowCount() || e.getFirstRow() < 0 || model.getRowCount() == 0 || e.getColumn() < 1) {
                 return;
             }
             Boolean encrypted = (Boolean) model.getValueAt(e.getFirstRow(), 2);
-            VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), 4))).toList().get(0);
+            VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), 5))).toList().get(0);
             String fileName = !encrypted ? vaultFile.getFileName() : vaultFile.getDisplayName() + '.' + vaultFile.getExtension();
             if (encrypted && !vaultFile.isLocked()) {
                 FileEncryptionService.encrypt(new File(Constant.VAULT_PATH + fileName), key);
@@ -197,12 +203,16 @@ public class ProVaultFrame implements ActionListener {
 
     private void deleteFile(int selectedRow) {
         if (selectedRow >= 0) {
-            VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, 4))).toList().get(0);
+            VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, 5))).toList().get(0);
             String fileName = getFileName(vaultFile);
-            vaultData.getFiles().remove(vaultFile);
-            updateVaultData();
-            new File(Constant.VAULT_PATH + fileName).delete();
-            model.removeRow(selectedRow);
+            int ret = JOptionPane.showConfirmDialog(null,
+                    "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION);
+            if(ret == 0) {
+                vaultData.getFiles().remove(vaultFile);
+                updateVaultData();
+                new File(Constant.VAULT_PATH + fileName).delete();
+                model.removeRow(selectedRow);
+            }
         }
     }
 
@@ -211,7 +221,7 @@ public class ProVaultFrame implements ActionListener {
         String displayName = name.substring(0, name.lastIndexOf('.'));
         String extension = name.substring(name.lastIndexOf('.') + 1);
         String uuid = UUID.randomUUID().toString();
-        File copyFile = new File(Constant.VAULT_PATH/* + File.separator*/ + uuid);
+        File copyFile = new File(Constant.VAULT_PATH + uuid);
         file.renameTo(copyFile);
         FileEncryptionService.encrypt(copyFile, key);
         VaultFile vaultFile = new VaultFile();
@@ -219,11 +229,12 @@ public class ProVaultFrame implements ActionListener {
         vaultFile.setDisplayName(displayName);
         vaultFile.setExtension(extension);
         vaultFile.setLocked(true);
+        vaultFile.setCategory(ProVaultUtil.getCategory(vaultData.getCategories()));
         vaultData.getFiles().add(vaultFile);
         updateVaultData();
         File vFile = new File(Constant.VAULT_PATH + uuid);
         model.addRow(new Object[]{fileChooser.getUI().getFileView(fileChooser).getIcon(
-                vFile), displayName, true, getStringSizeLengthFile(vFile.length()), uuid});
+                vFile), displayName, true, vaultFile.getCategory(), getStringSizeLengthFile(vFile.length()), uuid});
     }
 
     public static String getStringSizeLengthFile(long size) {
