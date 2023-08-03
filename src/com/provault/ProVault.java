@@ -2,20 +2,16 @@ package com.provault;
 
 import com.provault.constants.Constant;
 import com.provault.gui.ProVaultFrame;
-import com.provault.model.Key;
 import com.provault.model.VaultData;
 import com.provault.service.VaultDataService;
 import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
-import java.io.*;
-import java.nio.file.Files;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.File;
 
 public class ProVault {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             String key = ProVaultUtil.getKeyFromUser("Entry Key:");
             String sha1 = ProVaultUtil.getHash(key, "sha1");
