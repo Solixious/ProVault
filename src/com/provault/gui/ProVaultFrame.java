@@ -45,7 +45,7 @@ public class ProVaultFrame implements ActionListener {
         initializeTableUI();
 
         frame.setVisible(true);
-        frame.add(toolBar, BorderLayout.NORTH);
+        frame.add(toolBar, BorderLayout.WEST);
         frame.add(new JScrollPane(vaultFilesList), BorderLayout.CENTER);
         frame.setVisible(true);
     }
@@ -68,7 +68,7 @@ public class ProVaultFrame implements ActionListener {
         deleteFile = new JButton(new ImageIcon("img/remove.png"));
         deleteFile.addActionListener(this);
 
-        toolBar = new JToolBar();
+        toolBar = new JToolBar(JToolBar.VERTICAL);
         toolBar.add(addFile);
         toolBar.add(deleteFile);
     }
