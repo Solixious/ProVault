@@ -1,5 +1,7 @@
 package com.provault.service;
 
+import com.provault.model.Key;
+
 import javax.crypto.*;
 import javax.crypto.spec.*;
 import javax.swing.*;
@@ -7,25 +9,25 @@ import java.io.*;
 
 public class FileEncryptionService {
 
-    private static final String KEY = "You're an idiot!";
+    //private static final String KEY = "You're an idiot!";
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES";
 
-    public static void encrypt(final File inputFile) {
+    public static void encrypt(final File inputFile, Key key) {
         File encryptedFile = new File(inputFile.getAbsolutePath() + ".encrypted");
-        encryptToNewFile(inputFile, encryptedFile);
+        encryptToNewFile(inputFile, encryptedFile, key);
         renameToOldFilename(inputFile, encryptedFile);
     }
 
-    public static void decrypt(final File inputFile) {
+    public static void decrypt(final File inputFile, Key key) {
         File decryptedFile = new File(inputFile.getAbsolutePath() + ".decrypted");
-        decryptToNewFile(inputFile, decryptedFile);
+        decryptToNewFile(inputFile, decryptedFile, key);
         renameToOldFilename(inputFile, decryptedFile);
     }
 
-    private static void decryptToNewFile(final File input, final File output) {
+    private static void decryptToNewFile(final File input, final File output, Key key) {
         try (FileInputStream inputStream = new FileInputStream(input); FileOutputStream outputStream = new FileOutputStream(output)) {
-            SecretKeySpec secretKey = new SecretKeySpec(KEY.getBytes(), ALGORITHM);
+            SecretKeySpec secretKey = new SecretKeySpec(key.data, ALGORITHM);
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
@@ -40,9 +42,9 @@ public class FileEncryptionService {
         }
     }
 
-    private static void encryptToNewFile(final File inputFile, final File outputFile) {
+    private static void encryptToNewFile(final File inputFile, final File outputFile, Key key) {
         try (FileInputStream inputStream = new FileInputStream(inputFile); FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-            SecretKeySpec secretKey = new SecretKeySpec(KEY.getBytes(), ALGORITHM);
+            SecretKeySpec secretKey = new SecretKeySpec(key.data, ALGORITHM);
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             byte[] inputBytes = new byte[4096];

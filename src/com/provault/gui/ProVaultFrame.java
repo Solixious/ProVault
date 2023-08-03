@@ -1,6 +1,7 @@
 package com.provault.gui;
 
 import com.provault.constants.Constant;
+import com.provault.model.Key;
 import com.provault.model.VaultData;
 import com.provault.model.VaultFile;
 import com.provault.service.FileEncryptionService;
@@ -34,9 +35,11 @@ public class ProVaultFrame implements ActionListener {
     private DefaultTableModel model;
     private JFileChooser fileChooser;
     private final VaultData vaultData;
+    private final Key key;
 
-    public ProVaultFrame(final VaultData vaultData) {
+    public ProVaultFrame(final VaultData vaultData, Key key) {
         this.vaultData = vaultData;
+        this.key = key;
 
         initializeUI();
         initializeTableUI();
@@ -149,13 +152,13 @@ public class ProVaultFrame implements ActionListener {
             VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), 4))).toList().get(0);
             String fileName = !encrypted ? vaultFile.getFileName() : vaultFile.getDisplayName() + '.' + vaultFile.getExtension();
             if (encrypted && !vaultFile.isLocked()) {
-                FileEncryptionService.encrypt(new File(Constant.VAULT_PATH + fileName));
+                FileEncryptionService.encrypt(new File(Constant.VAULT_PATH + fileName), key);
                 rename(fileName, vaultFile.getFileName());
                 vaultFile.setLocked(true);
                 updateVaultData();
             }
             if (!encrypted && vaultFile.isLocked()) {
-                FileEncryptionService.decrypt(new File(Constant.VAULT_PATH + fileName));
+                FileEncryptionService.decrypt(new File(Constant.VAULT_PATH + fileName), key);
                 rename(fileName, vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
                 vaultFile.setLocked(false);
                 updateVaultData();
@@ -210,7 +213,7 @@ public class ProVaultFrame implements ActionListener {
         String uuid = UUID.randomUUID().toString();
         File copyFile = new File(Constant.VAULT_PATH/* + File.separator*/ + uuid);
         file.renameTo(copyFile);
-        FileEncryptionService.encrypt(copyFile);
+        FileEncryptionService.encrypt(copyFile, key);
         VaultFile vaultFile = new VaultFile();
         vaultFile.setFileName(uuid);
         vaultFile.setDisplayName(displayName);
