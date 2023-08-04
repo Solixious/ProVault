@@ -70,8 +70,11 @@ public class ProVaultFrame implements ActionListener {
         deleteFile.addActionListener(this);
 
         toolBar = new JToolBar(JToolBar.VERTICAL);
+        toolBar.addSeparator();
         toolBar.add(addFile);
+        toolBar.addSeparator();
         toolBar.add(deleteFile);
+        toolBar.addSeparator();
     }
 
     @Override
