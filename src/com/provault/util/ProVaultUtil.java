@@ -3,6 +3,7 @@ package com.provault.util;
 import com.provault.constants.Constant;
 import com.provault.model.Key;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.io.*;
 import java.nio.file.Files;
@@ -103,5 +104,15 @@ public class ProVaultUtil {
 
     public static void log(String logText) {
         System.out.println(logText);
+    }
+
+    public static ImageIcon getIconAsResource(String path) {
+        try {
+            InputStream inputStream = ProVaultUtil.class.getResourceAsStream(path);
+            assert inputStream != null;
+            return new ImageIcon(ImageIO.read(inputStream));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
