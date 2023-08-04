@@ -10,6 +10,7 @@ import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
@@ -43,7 +44,6 @@ public class ProVaultFrame implements ActionListener {
     private JButton addFile, deleteFile, close;
     private JTable vaultFilesList;
     private DefaultTableModel model;
-    private JFileChooser fileChooser;
     private final VaultData vaultData;
     private final Key key;
     private final Border emptyBorder = BorderFactory.createEmptyBorder();
@@ -58,6 +58,15 @@ public class ProVaultFrame implements ActionListener {
         JScrollPane jScrollPane = new JScrollPane(vaultFilesList);
         jScrollPane.setBorder(emptyBorder);
 
+        vaultFilesList.setBackground(Constant.COLOR_1);
+        vaultFilesList.setForeground(Constant.COLOR_4);
+        vaultFilesList.setShowHorizontalLines(false);
+        vaultFilesList.setShowVerticalLines(false);
+        vaultFilesList.setSelectionBackground(Constant.COLOR_3);
+        vaultFilesList.setSelectionForeground(Constant.COLOR_4);
+        jScrollPane.getViewport().setBackground(Constant.COLOR_1);
+        toolBar.setBackground(Constant.COLOR_2);
+
         frame.setVisible(true);
         frame.add(toolBar, BorderLayout.WEST);
         frame.add(jScrollPane, BorderLayout.CENTER);
@@ -70,8 +79,6 @@ public class ProVaultFrame implements ActionListener {
         frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         frame.setIconImage(Constant.ICON.getImage());
         frame.setUndecorated(true);
-
-        fileChooser = new JFileChooser();
 
         Taskbar taskbar = Taskbar.getTaskbar();
         taskbar.setIconImage(Constant.ICON.getImage());
@@ -181,9 +188,22 @@ public class ProVaultFrame implements ActionListener {
         vaultFilesList.setRowHeight(36);
 
         Font tableFont = new Font("Serif", Font.PLAIN, 16);
-        Font tableFontBold = new Font("Serif", Font.BOLD, 16);
         vaultFilesList.setFont(tableFont);
-        vaultFilesList.getTableHeader().setFont(tableFontBold);
+
+        final DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        final DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setBorder(noFocusBorder);
+                return this;
+            }
+        };
+        renderer.setBackground(Constant.COLOR_2);
+        renderer.setForeground(Constant.COLOR_4);
+        vaultFilesList.getTableHeader().setDefaultRenderer(renderer);
+        vaultFilesList.setDefaultRenderer(String.class, cellRenderer);
+        vaultFilesList.getTableHeader().setBackground(Constant.COLOR_2);
 
         DefaultCellEditor defaultCellEditor = (DefaultCellEditor) vaultFilesList.getDefaultEditor(Boolean.class);
         JCheckBox checkBox = (JCheckBox) defaultCellEditor.getComponent();
