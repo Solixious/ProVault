@@ -18,4 +18,7 @@ public interface Constant {
     ImageIcon QUESTION_ICON = ProVaultUtil.getIconAsResource("/img/question.png");
     ImageIcon REMOVE_ICON = ProVaultUtil.getIconAsResource("/img/remove.png");
     ImageIcon UNLOCKED_ICON = ProVaultUtil.getIconAsResource("/img/unlocked.png");
+    ImageIcon VIDEO_ICON = ProVaultUtil.getIconAsResource("/img/video.png");
+    ImageIcon DOCUMENT_ICON = ProVaultUtil.getIconAsResource("/img/document.png");
+    ImageIcon PICTURE_ICON = ProVaultUtil.getIconAsResource("/img/picture.png");
 }

@@ -140,7 +140,7 @@ public class ProVaultFrame implements ActionListener {
         for (VaultFile vaultFile : vaultFiles) {
             String fileName = getFileName(vaultFile);
             File vFile = new File(Constant.VAULT_PATH + fileName);
-            model.addRow(new Object[]{fileChooser.getUI().getFileView(fileChooser).getIcon(vFile), vaultFile.getDisplayName(), vaultFile.isLocked(), vaultFile.getCategory(), getStringSizeLengthFile(vFile.length()), vaultFile.getFileName()});
+            model.addRow(new Object[]{getIcon(vaultFile), vaultFile.getDisplayName(), vaultFile.isLocked(), vaultFile.getCategory(), getStringSizeLengthFile(vFile.length()), vaultFile.getFileName()});
         }
         vaultFilesList = new JTable(model) {
             @Override
@@ -288,6 +288,15 @@ public class ProVaultFrame implements ActionListener {
         File vFile = new File(Constant.VAULT_PATH + uuid);
         model.addRow(new Object[]{fileChooser.getUI().getFileView(fileChooser).getIcon(
                 vFile), displayName, true, vaultFile.getCategory(), getStringSizeLengthFile(vFile.length()), uuid});
+    }
+
+    private ImageIcon getIcon(VaultFile file) {
+        String extension = file.getExtension().toLowerCase();
+        return switch (extension) {
+            case "png", "jpg", "jpeg", "bmp", "gif" -> Constant.PICTURE_ICON;
+            case "mp4", "mov", "wmv", "avi", "flv" -> Constant.VIDEO_ICON;
+            default -> Constant.DOCUMENT_ICON;
+        };
     }
 
     public static String getStringSizeLengthFile(long size) {
