@@ -22,6 +22,8 @@ public class ProVault {
             ProVaultUtil.createPathIfMissing(vaultFolder, dataFile);
             ProVaultUtil.validateKey(keyFile, sha1);
             VaultData vaultData = VaultDataService.generateVaultData();
+            UIManager.put("ToolTip.background", Constant.COLOR_3);
+            UIManager.put("ToolTip.foreground", Constant.COLOR_4);
             new ProVaultFrame(vaultData, ProVaultUtil.get16Bytes(md5));
         });
     }

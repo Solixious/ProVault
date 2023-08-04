@@ -87,12 +87,15 @@ public class ProVaultFrame implements ActionListener {
         addFile = new JButton(Constant.ADD_ICON);
         addFile.addActionListener(this);
         addFile.setBorder(emptyBorder);
+        addFile.setToolTipText("Add file to vault");
         deleteFile = new JButton(Constant.REMOVE_ICON);
         deleteFile.addActionListener(this);
         deleteFile.setBorder(emptyBorder);
+        deleteFile.setToolTipText("Delete file from vault");
         close = new JButton(Constant.CLOSE_ICON);
         close.addActionListener(this);
         close.setBorder(emptyBorder);
+        close.setToolTipText("Exit application");
 
         Dimension separatorDimension = new Dimension(0, 16);
 
