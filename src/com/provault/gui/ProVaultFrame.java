@@ -242,7 +242,11 @@ public class ProVaultFrame implements ActionListener {
             if (e.getColumn() == DISPLAY_NAME_COLUMN) {
                 String updatedDisplayName = (String) model.getValueAt(e.getFirstRow(), DISPLAY_NAME_COLUMN);
                 String fileName = (String) model.getValueAt(e.getFirstRow(), FILE_NAME_COLUMN);
-                vaultData.getFiles().stream().filter(vaultFile -> vaultFile.getFileName().equals(fileName)).toList().get(0).setDisplayName(updatedDisplayName);
+                VaultFile file = vaultData.getFiles().stream().filter(vaultFile -> vaultFile.getFileName().equals(fileName)).toList().get(0);
+                if(!file.isLocked()) {
+                    rename(file.getDisplayName() + "." + file.getExtension(), updatedDisplayName + "." + file.getExtension());
+                }
+                file.setDisplayName(updatedDisplayName);
                 updateVaultData();
             }
         });

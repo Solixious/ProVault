@@ -9,8 +9,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
-import java.util.Optional;
 
 public class ProVaultUtil {
 
