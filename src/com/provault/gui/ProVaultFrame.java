@@ -37,7 +37,7 @@ public class ProVaultFrame implements ActionListener {
     private static final Integer FILE_SIZE_COLUMN = 4;
     private static final Integer FILE_NAME_COLUMN = 5;
     private static final String DECIMAL_PATTERN = "0.00";
-    public static final String TITLE = "Pro Vault";
+    private static final String TITLE = "Pro Vault";
 
     private JFrame frame;
     private JToolBar toolBar;
@@ -323,15 +323,11 @@ public class ProVaultFrame implements ActionListener {
     }
 
     public static String getStringSizeLengthFile(long size) {
-
         DecimalFormat df = new DecimalFormat(DECIMAL_PATTERN);
-
         float sizeKb = 1024.0f;
         float sizeMb = sizeKb * sizeKb;
         float sizeGb = sizeMb * sizeKb;
         float sizeTerra = sizeGb * sizeKb;
-
-
         if (size < sizeMb)
             return df.format(size / sizeKb) + " KB";
         else if (size < sizeGb)
