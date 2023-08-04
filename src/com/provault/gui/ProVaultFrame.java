@@ -9,6 +9,7 @@ import com.provault.service.VaultDataService;
 import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
@@ -45,6 +46,7 @@ public class ProVaultFrame implements ActionListener {
     private JFileChooser fileChooser;
     private final VaultData vaultData;
     private final Key key;
+    private final Border emptyBorder = BorderFactory.createEmptyBorder();
 
     public ProVaultFrame(final VaultData vaultData, Key key) {
         this.vaultData = vaultData;
@@ -53,9 +55,12 @@ public class ProVaultFrame implements ActionListener {
         initializeUI();
         initializeTableUI();
 
+        JScrollPane jScrollPane = new JScrollPane(vaultFilesList);
+        jScrollPane.setBorder(emptyBorder);
+
         frame.setVisible(true);
         frame.add(toolBar, BorderLayout.WEST);
-        frame.add(new JScrollPane(vaultFilesList), BorderLayout.CENTER);
+        frame.add(jScrollPane, BorderLayout.CENTER);
         frame.setVisible(true);
     }
 
@@ -64,20 +69,26 @@ public class ProVaultFrame implements ActionListener {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         frame.setIconImage(Constant.ICON.getImage());
+        frame.setUndecorated(true);
 
         fileChooser = new JFileChooser();
 
         Taskbar taskbar = Taskbar.getTaskbar();
         taskbar.setIconImage(Constant.ICON.getImage());
 
+
         addFile = new JButton(Constant.ADD_ICON);
         addFile.addActionListener(this);
+        addFile.setBorder(emptyBorder);
         deleteFile = new JButton(Constant.REMOVE_ICON);
         deleteFile.addActionListener(this);
+        deleteFile.setBorder(emptyBorder);
         close = new JButton(Constant.CLOSE_ICON);
         close.addActionListener(this);
+        close.setBorder(emptyBorder);
 
         toolBar = new JToolBar(JToolBar.VERTICAL);
+        toolBar.setFloatable(false);
         toolBar.addSeparator();
         toolBar.add(addFile);
         toolBar.addSeparator();

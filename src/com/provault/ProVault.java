@@ -13,7 +13,7 @@ public class ProVault {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            String key = ProVaultUtil.getKeyFromUser("Entry Key:");
+            String key = ProVaultUtil.getKeyFromUser("Enter Password:");
             String sha1 = ProVaultUtil.getHash(key, "sha1");
             String md5 = ProVaultUtil.getHash(key, "md5");
             File vaultFolder = new File(Constant.VAULT_PATH);
