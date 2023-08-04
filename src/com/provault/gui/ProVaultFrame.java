@@ -230,13 +230,16 @@ public class ProVaultFrame implements ActionListener {
         if (selectedRow >= 0) {
             VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, FILE_NAME_COLUMN))).toList().get(0);
             String fileName = getFileName(vaultFile);
-            int ret = JOptionPane.showConfirmDialog(null,
-                    "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION);
+            int ret = JOptionPane.showConfirmDialog(frame,
+                    "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, new ImageIcon("img/question.png"));
             if(ret == 0) {
                 vaultData.getFiles().remove(vaultFile);
                 updateVaultData();
-                new File(Constant.VAULT_PATH + fileName).delete();
-                model.removeRow(selectedRow);
+                if(new File(Constant.VAULT_PATH + fileName).delete()) {
+                    model.removeRow(selectedRow);
+                } else {
+                    JOptionPane.showConfirmDialog(frame, "File deletion failed", "File deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
     }
