@@ -28,7 +28,6 @@ import java.util.UUID;
 
 public class ProVaultFrame implements ActionListener {
 
-    private static final String ICON = "img/icon.png";
     private static final Integer ICON_COLUMN = 0;
     private static final Integer DISPLAY_NAME_COLUMN = 1;
     private static final Integer ENCRYPTED_STATUS_COLUMN = 2;
@@ -59,23 +58,21 @@ public class ProVaultFrame implements ActionListener {
     }
 
     private void initializeUI() {
-        ImageIcon icon = new ImageIcon(ICON);
-
         frame = new JFrame("Pro Vault");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        frame.setIconImage(icon.getImage());
+        frame.setIconImage(Constant.ICON.getImage());
 
         fileChooser = new JFileChooser();
 
         Taskbar taskbar = Taskbar.getTaskbar();
-        taskbar.setIconImage(icon.getImage());
+        taskbar.setIconImage(Constant.ICON.getImage());
 
-        addFile = new JButton(new ImageIcon("img/add.png"));
+        addFile = new JButton(Constant.ADD_ICON);
         addFile.addActionListener(this);
-        deleteFile = new JButton(new ImageIcon("img/remove.png"));
+        deleteFile = new JButton(Constant.REMOVE_ICON);
         deleteFile.addActionListener(this);
-        close = new JButton(new ImageIcon("img/close.png"));
+        close = new JButton(Constant.CLOSE_ICON);
         close.addActionListener(this);
 
         toolBar = new JToolBar(JToolBar.VERTICAL);
@@ -169,18 +166,15 @@ public class ProVaultFrame implements ActionListener {
         vaultFilesList.setRowHeight(36);
         vaultFilesList.setFont(new Font("Serif", Font.PLAIN, 16));
 
-        ImageIcon locked = new ImageIcon("img/locked.png");
-        ImageIcon unlocked = new ImageIcon("img/unlocked.png");
-
         DefaultCellEditor defaultCellEditor = (DefaultCellEditor) vaultFilesList.getDefaultEditor(Boolean.class);
         JCheckBox checkBox = (JCheckBox) defaultCellEditor.getComponent();
-        checkBox.setIcon(unlocked);
-        checkBox.setSelectedIcon(locked);
+        checkBox.setIcon(Constant.UNLOCKED_ICON);
+        checkBox.setSelectedIcon(Constant.LOCKED_ICON);
 
         TableCellRenderer tableCellRenderer = vaultFilesList.getDefaultRenderer(Boolean.class);
         checkBox = (JCheckBox) tableCellRenderer;
-        checkBox.setIcon(unlocked);
-        checkBox.setSelectedIcon(locked);
+        checkBox.setIcon(Constant.UNLOCKED_ICON);
+        checkBox.setSelectedIcon(Constant.LOCKED_ICON);
 
         model.addTableModelListener(e -> {
             if (e.getFirstRow() >= model.getRowCount() || e.getFirstRow() < 0 || model.getRowCount() == 0 || e.getColumn() < 1) {
@@ -246,7 +240,7 @@ public class ProVaultFrame implements ActionListener {
             VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, FILE_NAME_COLUMN))).toList().get(0);
             String fileName = getFileName(vaultFile);
             int ret = JOptionPane.showConfirmDialog(frame,
-                    "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, new ImageIcon("img/question.png"));
+                    "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, Constant.QUESTION_ICON);
             if(ret == 0) {
                 vaultData.getFiles().remove(vaultFile);
                 updateVaultData();
