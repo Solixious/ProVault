@@ -87,15 +87,17 @@ public class ProVaultFrame implements ActionListener {
         close.addActionListener(this);
         close.setBorder(emptyBorder);
 
+        Dimension separatorDimension = new Dimension(0, 16);
+
         toolBar = new JToolBar(JToolBar.VERTICAL);
         toolBar.setFloatable(false);
-        toolBar.addSeparator();
+        toolBar.addSeparator(separatorDimension);
         toolBar.add(addFile);
-        toolBar.addSeparator();
+        toolBar.addSeparator(separatorDimension);
         toolBar.add(deleteFile);
-        toolBar.addSeparator();
+        toolBar.addSeparator(separatorDimension);
         toolBar.add(close);
-        toolBar.addSeparator();
+        toolBar.addSeparator(separatorDimension);
     }
 
     @Override
@@ -171,9 +173,10 @@ public class ProVaultFrame implements ActionListener {
         vaultFilesList.getColumnModel().getColumn(ICON_COLUMN).setPreferredWidth(50);
         vaultFilesList.getColumnModel().getColumn(DISPLAY_NAME_COLUMN).setPreferredWidth(300);
         vaultFilesList.getColumnModel().getColumn(ENCRYPTED_STATUS_COLUMN).setPreferredWidth(42);
-        vaultFilesList.getColumnModel().getColumn(CATEGORY_COLUMN).setPreferredWidth(300);
+        vaultFilesList.getColumnModel().getColumn(CATEGORY_COLUMN).setPreferredWidth(200);
         vaultFilesList.getColumnModel().getColumn(FILE_SIZE_COLUMN).setPreferredWidth(200);
         vaultFilesList.getColumnModel().getColumn(FILE_NAME_COLUMN).setPreferredWidth(0);
+        vaultFilesList.getColumnModel().removeColumn(vaultFilesList.getColumnModel().getColumn(FILE_NAME_COLUMN));
         vaultFilesList.getTableHeader().setReorderingAllowed(false);
         vaultFilesList.setRowHeight(36);
 
