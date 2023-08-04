@@ -34,6 +34,8 @@ public class ProVaultFrame implements ActionListener {
     private static final Integer CATEGORY_COLUMN = 3;
     private static final Integer FILE_SIZE_COLUMN = 4;
     private static final Integer FILE_NAME_COLUMN = 5;
+    private static final String DECIMAL_PATTERN = "0.00";
+    public static final String TITLE = "Pro Vault";
 
     private JFrame frame;
     private JToolBar toolBar;
@@ -58,7 +60,7 @@ public class ProVaultFrame implements ActionListener {
     }
 
     private void initializeUI() {
-        frame = new JFrame("Pro Vault");
+        frame = new JFrame(TITLE);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         frame.setIconImage(Constant.ICON.getImage());
@@ -105,7 +107,6 @@ public class ProVaultFrame implements ActionListener {
                 deleteFile(selectedRow);
             }
         } else if (e.getSource() == close) {
-            System.out.println("Closing");
             frame.dispose();
         }
     }
@@ -276,7 +277,7 @@ public class ProVaultFrame implements ActionListener {
 
     public static String getStringSizeLengthFile(long size) {
 
-        DecimalFormat df = new DecimalFormat("0.00");
+        DecimalFormat df = new DecimalFormat(DECIMAL_PATTERN);
 
         float sizeKb = 1024.0f;
         float sizeMb = sizeKb * sizeKb;
