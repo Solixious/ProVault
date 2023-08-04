@@ -119,7 +119,7 @@ public class ProVaultFrame implements ActionListener {
             if (ret == JFileChooser.APPROVE_OPTION) {
                 File[] files = fileChooser.getSelectedFiles();
                 for (File file : files) {
-                    addFile(fileChooser, file);
+                    addFile(file);
                 }
             }
         } else if (e.getSource() == deleteFile) {
@@ -299,7 +299,7 @@ public class ProVaultFrame implements ActionListener {
         }
     }
 
-    private void addFile(JFileChooser fileChooser, File file) {
+    private void addFile(File file) {
         String name = file.getName();
         String displayName = name.substring(0, name.lastIndexOf('.'));
         String extension = name.substring(name.lastIndexOf('.') + 1);
@@ -316,8 +316,7 @@ public class ProVaultFrame implements ActionListener {
         vaultData.getFiles().add(vaultFile);
         updateVaultData();
         File vFile = new File(Constant.VAULT_PATH + uuid);
-        model.addRow(new Object[]{fileChooser.getUI().getFileView(fileChooser).getIcon(
-                vFile), displayName, true, vaultFile.getCategory(), getStringSizeLengthFile(vFile.length()), uuid});
+        model.addRow(new Object[]{getIcon(vaultFile), displayName, true, vaultFile.getCategory(), getStringSizeLengthFile(vFile.length()), uuid});
     }
 
     private ImageIcon getIcon(VaultFile file) {
