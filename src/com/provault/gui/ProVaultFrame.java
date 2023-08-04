@@ -133,7 +133,7 @@ public class ProVaultFrame implements ActionListener {
         };
         model.addColumn("Icon");
         model.addColumn("File Name");
-        model.addColumn("Encrypted");
+        model.addColumn("Lock");
         model.addColumn("Category");
         model.addColumn("File Size");
         model.addColumn("");
@@ -176,7 +176,11 @@ public class ProVaultFrame implements ActionListener {
         vaultFilesList.getColumnModel().getColumn(FILE_NAME_COLUMN).setPreferredWidth(0);
         vaultFilesList.getTableHeader().setReorderingAllowed(false);
         vaultFilesList.setRowHeight(36);
-        vaultFilesList.setFont(new Font("Serif", Font.PLAIN, 16));
+
+        Font tableFont = new Font("Serif", Font.PLAIN, 16);
+        Font tableFontBold = new Font("Serif", Font.BOLD, 16);
+        vaultFilesList.setFont(tableFont);
+        vaultFilesList.getTableHeader().setFont(tableFontBold);
 
         DefaultCellEditor defaultCellEditor = (DefaultCellEditor) vaultFilesList.getDefaultEditor(Boolean.class);
         JCheckBox checkBox = (JCheckBox) defaultCellEditor.getComponent();
