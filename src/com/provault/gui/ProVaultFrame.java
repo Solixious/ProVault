@@ -37,7 +37,7 @@ public class ProVaultFrame implements ActionListener {
 
     private JFrame frame;
     private JToolBar toolBar;
-    private JButton addFile, deleteFile;
+    private JButton addFile, deleteFile, close;
     private JTable vaultFilesList;
     private DefaultTableModel model;
     private JFileChooser fileChooser;
@@ -74,12 +74,16 @@ public class ProVaultFrame implements ActionListener {
         addFile.addActionListener(this);
         deleteFile = new JButton(new ImageIcon("img/remove.png"));
         deleteFile.addActionListener(this);
+        close = new JButton(new ImageIcon("img/close.png"));
+        close.addActionListener(this);
 
         toolBar = new JToolBar(JToolBar.VERTICAL);
         toolBar.addSeparator();
         toolBar.add(addFile);
         toolBar.addSeparator();
         toolBar.add(deleteFile);
+        toolBar.addSeparator();
+        toolBar.add(close);
         toolBar.addSeparator();
     }
 
@@ -102,6 +106,9 @@ public class ProVaultFrame implements ActionListener {
                 int selectedRow = selectedRows[i];
                 deleteFile(selectedRow);
             }
+        } else if (e.getSource() == close) {
+            System.out.println("Closing");
+            frame.dispose();
         }
     }
 
@@ -110,7 +117,8 @@ public class ProVaultFrame implements ActionListener {
         model = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return !(column <= 1);
+                return column == ENCRYPTED_STATUS_COLUMN
+                        || column == DISPLAY_NAME_COLUMN;
             }
         };
         model.addColumn("Icon");
@@ -163,19 +171,27 @@ public class ProVaultFrame implements ActionListener {
             if (e.getFirstRow() >= model.getRowCount() || e.getFirstRow() < 0 || model.getRowCount() == 0 || e.getColumn() < 1) {
                 return;
             }
-            Boolean encrypted = (Boolean) model.getValueAt(e.getFirstRow(), ENCRYPTED_STATUS_COLUMN);
-            VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), FILE_NAME_COLUMN))).toList().get(0);
-            String fileName = !encrypted ? vaultFile.getFileName() : vaultFile.getDisplayName() + '.' + vaultFile.getExtension();
-            if (encrypted && !vaultFile.isLocked()) {
-                FileEncryptionService.encrypt(new File(Constant.VAULT_PATH + fileName), key);
-                rename(fileName, vaultFile.getFileName());
-                vaultFile.setLocked(true);
-                updateVaultData();
+            if(e.getColumn() == ENCRYPTED_STATUS_COLUMN) {
+                Boolean encrypted = (Boolean) model.getValueAt(e.getFirstRow(), ENCRYPTED_STATUS_COLUMN);
+                VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), FILE_NAME_COLUMN))).toList().get(0);
+                String fileName = !encrypted ? vaultFile.getFileName() : vaultFile.getDisplayName() + '.' + vaultFile.getExtension();
+                if (encrypted && !vaultFile.isLocked()) {
+                    FileEncryptionService.encrypt(new File(Constant.VAULT_PATH + fileName), key);
+                    rename(fileName, vaultFile.getFileName());
+                    vaultFile.setLocked(true);
+                    updateVaultData();
+                }
+                if (!encrypted && vaultFile.isLocked()) {
+                    FileEncryptionService.decrypt(new File(Constant.VAULT_PATH + fileName), key);
+                    rename(fileName, vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
+                    vaultFile.setLocked(false);
+                    updateVaultData();
+                }
             }
-            if (!encrypted && vaultFile.isLocked()) {
-                FileEncryptionService.decrypt(new File(Constant.VAULT_PATH + fileName), key);
-                rename(fileName, vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
-                vaultFile.setLocked(false);
+            if (e.getColumn() == DISPLAY_NAME_COLUMN) {
+                String updatedDisplayName = (String) model.getValueAt(e.getFirstRow(), DISPLAY_NAME_COLUMN);
+                String fileName = (String) model.getValueAt(e.getFirstRow(), FILE_NAME_COLUMN);
+                vaultData.getFiles().stream().filter(vaultFile -> vaultFile.getFileName().equals(fileName)).toList().get(0).setDisplayName(updatedDisplayName);
                 updateVaultData();
             }
         });
