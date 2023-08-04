@@ -28,6 +28,12 @@ import java.util.UUID;
 public class ProVaultFrame implements ActionListener {
 
     private static final String ICON = "img/icon.png";
+    private static final Integer ICON_COLUMN = 0;
+    private static final Integer DISPLAY_NAME_COLUMN = 1;
+    private static final Integer ENCRYPTED_STATUS_COLUMN = 2;
+    private static final Integer CATEGORY_COLUMN = 3;
+    private static final Integer FILE_SIZE_COLUMN = 4;
+    private static final Integer FILE_NAME_COLUMN = 5;
 
     private JFrame frame;
     private JToolBar toolBar;
@@ -134,22 +140,22 @@ public class ProVaultFrame implements ActionListener {
                 Point point = mouseEvent.getPoint();
                 int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
-                    if ((Boolean) model.getValueAt(row, 2)) {
+                    if ((Boolean) model.getValueAt(row, ENCRYPTED_STATUS_COLUMN)) {
                         return;
                     }
-                    VaultFile vaultFile = vaultFiles.stream().filter(e -> e.getFileName().equals(model.getValueAt(row, 5))).toList().get(0);
+                    VaultFile vaultFile = vaultFiles.stream().filter(e -> e.getFileName().equals(model.getValueAt(row, FILE_NAME_COLUMN))).toList().get(0);
                     openFile(Constant.VAULT_PATH + vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
                 }
             }
         });
         vaultFilesList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         vaultFilesList.getTableHeader().setResizingAllowed(false);
-        vaultFilesList.getColumnModel().getColumn(0).setPreferredWidth(50);
-        vaultFilesList.getColumnModel().getColumn(1).setPreferredWidth(300);
-        vaultFilesList.getColumnModel().getColumn(2).setPreferredWidth(100);
-        vaultFilesList.getColumnModel().getColumn(3).setPreferredWidth(300);
-        vaultFilesList.getColumnModel().getColumn(4).setPreferredWidth(200);
-        vaultFilesList.getColumnModel().getColumn(5).setPreferredWidth(0);
+        vaultFilesList.getColumnModel().getColumn(ICON_COLUMN).setPreferredWidth(50);
+        vaultFilesList.getColumnModel().getColumn(DISPLAY_NAME_COLUMN).setPreferredWidth(300);
+        vaultFilesList.getColumnModel().getColumn(ENCRYPTED_STATUS_COLUMN).setPreferredWidth(100);
+        vaultFilesList.getColumnModel().getColumn(CATEGORY_COLUMN).setPreferredWidth(300);
+        vaultFilesList.getColumnModel().getColumn(FILE_SIZE_COLUMN).setPreferredWidth(200);
+        vaultFilesList.getColumnModel().getColumn(FILE_NAME_COLUMN).setPreferredWidth(0);
         vaultFilesList.getTableHeader().setReorderingAllowed(false);
         vaultFilesList.setRowHeight(30);
         vaultFilesList.setFont(new Font("Serif", Font.PLAIN, 16));
@@ -157,8 +163,8 @@ public class ProVaultFrame implements ActionListener {
             if (e.getFirstRow() >= model.getRowCount() || e.getFirstRow() < 0 || model.getRowCount() == 0 || e.getColumn() < 1) {
                 return;
             }
-            Boolean encrypted = (Boolean) model.getValueAt(e.getFirstRow(), 2);
-            VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), 5))).toList().get(0);
+            Boolean encrypted = (Boolean) model.getValueAt(e.getFirstRow(), ENCRYPTED_STATUS_COLUMN);
+            VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), FILE_NAME_COLUMN))).toList().get(0);
             String fileName = !encrypted ? vaultFile.getFileName() : vaultFile.getDisplayName() + '.' + vaultFile.getExtension();
             if (encrypted && !vaultFile.isLocked()) {
                 FileEncryptionService.encrypt(new File(Constant.VAULT_PATH + fileName), key);
@@ -206,7 +212,7 @@ public class ProVaultFrame implements ActionListener {
 
     private void deleteFile(int selectedRow) {
         if (selectedRow >= 0) {
-            VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, 5))).toList().get(0);
+            VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, FILE_NAME_COLUMN))).toList().get(0);
             String fileName = getFileName(vaultFile);
             int ret = JOptionPane.showConfirmDialog(null,
                     "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION);
