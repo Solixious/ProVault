@@ -181,7 +181,7 @@ public class ProVaultFrame implements ActionListener {
             if (e.getFirstRow() >= model.getRowCount() || e.getFirstRow() < 0 || model.getRowCount() == 0 || e.getColumn() < 1) {
                 return;
             }
-            if(e.getColumn() == ENCRYPTED_STATUS_COLUMN) {
+            if (e.getColumn() == ENCRYPTED_STATUS_COLUMN) {
                 Boolean encrypted = (Boolean) model.getValueAt(e.getFirstRow(), ENCRYPTED_STATUS_COLUMN);
                 VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), FILE_NAME_COLUMN))).toList().get(0);
                 String fileName = !encrypted ? vaultFile.getFileName() : vaultFile.getDisplayName() + '.' + vaultFile.getExtension();
@@ -242,10 +242,10 @@ public class ProVaultFrame implements ActionListener {
             String fileName = getFileName(vaultFile);
             int ret = JOptionPane.showConfirmDialog(frame,
                     "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, Constant.QUESTION_ICON);
-            if(ret == 0) {
+            if (ret == 0) {
                 vaultData.getFiles().remove(vaultFile);
                 updateVaultData();
-                if(new File(Constant.VAULT_PATH + fileName).delete()) {
+                if (new File(Constant.VAULT_PATH + fileName).delete()) {
                     model.removeRow(selectedRow);
                 } else {
                     JOptionPane.showConfirmDialog(frame, "File deletion failed", "File deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
