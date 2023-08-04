@@ -10,6 +10,7 @@ import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -160,13 +161,27 @@ public class ProVaultFrame implements ActionListener {
         vaultFilesList.getTableHeader().setResizingAllowed(false);
         vaultFilesList.getColumnModel().getColumn(ICON_COLUMN).setPreferredWidth(50);
         vaultFilesList.getColumnModel().getColumn(DISPLAY_NAME_COLUMN).setPreferredWidth(300);
-        vaultFilesList.getColumnModel().getColumn(ENCRYPTED_STATUS_COLUMN).setPreferredWidth(100);
+        vaultFilesList.getColumnModel().getColumn(ENCRYPTED_STATUS_COLUMN).setPreferredWidth(42);
         vaultFilesList.getColumnModel().getColumn(CATEGORY_COLUMN).setPreferredWidth(300);
         vaultFilesList.getColumnModel().getColumn(FILE_SIZE_COLUMN).setPreferredWidth(200);
         vaultFilesList.getColumnModel().getColumn(FILE_NAME_COLUMN).setPreferredWidth(0);
         vaultFilesList.getTableHeader().setReorderingAllowed(false);
-        vaultFilesList.setRowHeight(30);
+        vaultFilesList.setRowHeight(36);
         vaultFilesList.setFont(new Font("Serif", Font.PLAIN, 16));
+
+        ImageIcon locked = new ImageIcon("img/locked.png");
+        ImageIcon unlocked = new ImageIcon("img/unlocked.png");
+
+        DefaultCellEditor defaultCellEditor = (DefaultCellEditor) vaultFilesList.getDefaultEditor(Boolean.class);
+        JCheckBox checkBox = (JCheckBox) defaultCellEditor.getComponent();
+        checkBox.setIcon(unlocked);
+        checkBox.setSelectedIcon(locked);
+
+        TableCellRenderer tableCellRenderer = vaultFilesList.getDefaultRenderer(Boolean.class);
+        checkBox = (JCheckBox) tableCellRenderer;
+        checkBox.setIcon(unlocked);
+        checkBox.setSelectedIcon(locked);
+
         model.addTableModelListener(e -> {
             if (e.getFirstRow() >= model.getRowCount() || e.getFirstRow() < 0 || model.getRowCount() == 0 || e.getColumn() < 1) {
                 return;
