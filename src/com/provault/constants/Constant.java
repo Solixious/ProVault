@@ -9,7 +9,7 @@ import java.io.File;
 
 public interface Constant {
 
-    String VAULT_PATH = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + File.separator + ".vault" + File.separator;
+    String VAULT_PATH = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + File.separator + ".test-vault" + File.separator;
     String DATA_FILE = VAULT_PATH + ".data";
     String KEY_FILE = VAULT_PATH + ".key";
     Color COLOR_1 = new Color(0xFAF0D7);
@@ -26,4 +26,5 @@ public interface Constant {
     ImageIcon VIDEO_ICON = ProVaultUtil.getIconAsResource("/img/video.png");
     ImageIcon DOCUMENT_ICON = ProVaultUtil.getIconAsResource("/img/document.png");
     ImageIcon PICTURE_ICON = ProVaultUtil.getIconAsResource("/img/picture.png");
+    ImageIcon CURSOR = ProVaultUtil.getIconAsResource("/img/cursor.png");
 }

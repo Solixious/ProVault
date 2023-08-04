@@ -67,9 +67,9 @@ public class ProVaultFrame implements ActionListener {
         jScrollPane.getViewport().setBackground(Constant.COLOR_1);
         toolBar.setBackground(Constant.COLOR_2);
 
-        frame.setVisible(true);
         frame.add(toolBar, BorderLayout.WEST);
         frame.add(jScrollPane, BorderLayout.CENTER);
+        frame.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(Constant.CURSOR.getImage(), new Point(0, 0), "img"));
         frame.setVisible(true);
     }
 
