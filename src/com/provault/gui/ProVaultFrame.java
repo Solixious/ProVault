@@ -11,7 +11,6 @@ import com.provault.service.VaultDataService;
 import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -25,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -38,78 +36,23 @@ public class ProVaultFrame implements ActionListener {
     private static final Integer CATEGORY_COLUMN = 3;
     private static final Integer FILE_SIZE_COLUMN = 4;
     private static final Integer FILE_NAME_COLUMN = 5;
-    private static final String DECIMAL_PATTERN = "0.00";
-    private static final String TITLE = "Pro Vault";
 
     private JFrame frame;
     private JToolBar toolBar;
     private JButton addFile, deleteFile, close;
     private JTable vaultFilesList;
     private DefaultTableModel model;
+    private JScrollPane jScrollPane;
     private final VaultData vaultData;
     private final Key key;
-    private final Border emptyBorder = BorderFactory.createEmptyBorder();
 
     public ProVaultFrame(final VaultData vaultData, Key key) {
         this.vaultData = vaultData;
         this.key = key;
-
-        initializeUI();
-        initializeTableUI();
-
-        JScrollPane jScrollPane = new JScrollPane(vaultFilesList);
-        jScrollPane.setBorder(emptyBorder);
-
-        vaultFilesList.setBackground(Colours.COLOR_1);
-        vaultFilesList.setForeground(Colours.COLOR_4);
-        vaultFilesList.setShowHorizontalLines(false);
-        vaultFilesList.setShowVerticalLines(false);
-        vaultFilesList.setSelectionBackground(Colours.COLOR_3);
-        vaultFilesList.setSelectionForeground(Colours.COLOR_4);
-        jScrollPane.getViewport().setBackground(Colours.COLOR_1);
-        toolBar.setBackground(Colours.COLOR_2);
-
-        frame.add(toolBar, BorderLayout.WEST);
-        frame.add(jScrollPane, BorderLayout.CENTER);
-        frame.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(Icons.CURSOR.getImage(), new Point(0, 0), "img"));
-        frame.setVisible(true);
-    }
-
-    private void initializeUI() {
-        frame = new JFrame(TITLE);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        frame.setIconImage(Icons.ICON.getImage());
-        frame.setUndecorated(true);
-
-        Taskbar taskbar = Taskbar.getTaskbar();
-        taskbar.setIconImage(Icons.ICON.getImage());
-
-
-        addFile = new JButton(Icons.ADD_ICON);
-        addFile.addActionListener(this);
-        addFile.setBorder(emptyBorder);
-        addFile.setToolTipText("Add file to vault");
-        deleteFile = new JButton(Icons.REMOVE_ICON);
-        deleteFile.addActionListener(this);
-        deleteFile.setBorder(emptyBorder);
-        deleteFile.setToolTipText("Delete file from vault");
-        close = new JButton(Icons.CLOSE_ICON);
-        close.addActionListener(this);
-        close.setBorder(emptyBorder);
-        close.setToolTipText("Exit application");
-
-        Dimension separatorDimension = new Dimension(0, 16);
-
-        toolBar = new JToolBar(JToolBar.VERTICAL);
-        toolBar.setFloatable(false);
-        toolBar.addSeparator(separatorDimension);
-        toolBar.add(addFile);
-        toolBar.addSeparator(separatorDimension);
-        toolBar.add(deleteFile);
-        toolBar.addSeparator(separatorDimension);
-        toolBar.add(close);
-        toolBar.addSeparator(separatorDimension);
+        initializeTable();
+        initializeUIElements();
+        initializeTheme();
+        initializeFrame();
     }
 
     @Override
@@ -136,7 +79,30 @@ public class ProVaultFrame implements ActionListener {
         }
     }
 
-    private void initializeTableUI() {
+    private void initializeUIElements() {
+        frame = new JFrame(Constant.TITLE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        frame.setIconImage(Icons.ICON.getImage());
+        frame.setUndecorated(true);
+
+        Taskbar taskbar = Taskbar.getTaskbar();
+        taskbar.setIconImage(Icons.ICON.getImage());
+
+        addFile = new ProVaultButton(Icons.ADD_ICON, this, "Add file to vault");
+        deleteFile = new ProVaultButton(Icons.REMOVE_ICON, this, "Delete file from vault");
+        close = new ProVaultButton(Icons.CLOSE_ICON, this, "Exit application");
+
+        toolBar = new ProVaultToolBar();
+        toolBar.add(addFile);
+        toolBar.add(deleteFile);
+        toolBar.add(close);
+
+        jScrollPane = new JScrollPane(vaultFilesList);
+        jScrollPane.setBorder(BorderFactory.createEmptyBorder());
+    }
+
+    private void initializeTable() {
         List<VaultFile> vaultFiles = vaultData.getFiles();
         model = new DefaultTableModel() {
             @Override
@@ -154,18 +120,9 @@ public class ProVaultFrame implements ActionListener {
         for (VaultFile vaultFile : vaultFiles) {
             String fileName = getFileName(vaultFile);
             File vFile = new File(Constant.VAULT_PATH + fileName);
-            model.addRow(new Object[]{getIcon(vaultFile), vaultFile.getDisplayName(), vaultFile.isLocked(), vaultFile.getCategory(), getStringSizeLengthFile(vFile.length()), vaultFile.getFileName()});
+            model.addRow(new Object[]{ProVaultUtil.getIcon(vaultFile), vaultFile.getDisplayName(), vaultFile.isLocked(), vaultFile.getCategory(), ProVaultUtil.getStringSizeLengthFile(vFile.length()), vaultFile.getFileName()});
         }
-        vaultFilesList = new JTable(model) {
-            @Override
-            public Class getColumnClass(int column) {
-                return switch (column) {
-                    case 0 -> Icon.class;
-                    case 2 -> Boolean.class;
-                    default -> String.class;
-                };
-            }
-        };
+        vaultFilesList = new ProVaultTable(model);
         vaultFilesList.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent mouseEvent) {
                 JTable table = (JTable) mouseEvent.getSource();
@@ -180,8 +137,6 @@ public class ProVaultFrame implements ActionListener {
                 }
             }
         });
-        vaultFilesList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        vaultFilesList.getTableHeader().setResizingAllowed(false);
         vaultFilesList.getColumnModel().getColumn(ICON_COLUMN).setPreferredWidth(50);
         vaultFilesList.getColumnModel().getColumn(DISPLAY_NAME_COLUMN).setPreferredWidth(300);
         vaultFilesList.getColumnModel().getColumn(ENCRYPTED_STATUS_COLUMN).setPreferredWidth(42);
@@ -189,8 +144,6 @@ public class ProVaultFrame implements ActionListener {
         vaultFilesList.getColumnModel().getColumn(FILE_SIZE_COLUMN).setPreferredWidth(200);
         vaultFilesList.getColumnModel().getColumn(FILE_NAME_COLUMN).setPreferredWidth(0);
         vaultFilesList.getColumnModel().removeColumn(vaultFilesList.getColumnModel().getColumn(FILE_NAME_COLUMN));
-        vaultFilesList.getTableHeader().setReorderingAllowed(false);
-        vaultFilesList.setRowHeight(36);
 
         Font tableFont = new Font("Serif", Font.PLAIN, 16);
         vaultFilesList.setFont(tableFont);
@@ -232,26 +185,44 @@ public class ProVaultFrame implements ActionListener {
                     FileEncryptionService.encrypt(new File(Constant.VAULT_PATH + fileName), key);
                     rename(fileName, vaultFile.getFileName());
                     vaultFile.setLocked(true);
-                    updateVaultData();
+                    VaultDataService.writeVaultData(vaultData);
                 }
                 if (!encrypted && vaultFile.isLocked()) {
                     FileEncryptionService.decrypt(new File(Constant.VAULT_PATH + fileName), key);
                     rename(fileName, vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
                     vaultFile.setLocked(false);
-                    updateVaultData();
+                    VaultDataService.writeVaultData(vaultData);
                 }
             }
             if (e.getColumn() == DISPLAY_NAME_COLUMN) {
                 String updatedDisplayName = (String) model.getValueAt(e.getFirstRow(), DISPLAY_NAME_COLUMN);
                 String fileName = (String) model.getValueAt(e.getFirstRow(), FILE_NAME_COLUMN);
                 VaultFile file = vaultData.getFiles().stream().filter(vaultFile -> vaultFile.getFileName().equals(fileName)).toList().get(0);
-                if(!file.isLocked()) {
+                if (!file.isLocked()) {
                     rename(file.getDisplayName() + "." + file.getExtension(), updatedDisplayName + "." + file.getExtension());
                 }
                 file.setDisplayName(updatedDisplayName);
-                updateVaultData();
+                VaultDataService.writeVaultData(vaultData);
             }
         });
+    }
+
+    private void initializeTheme() {
+        vaultFilesList.setBackground(Colours.COLOR_1);
+        vaultFilesList.setForeground(Colours.COLOR_4);
+        vaultFilesList.setShowHorizontalLines(false);
+        vaultFilesList.setShowVerticalLines(false);
+        vaultFilesList.setSelectionBackground(Colours.COLOR_3);
+        vaultFilesList.setSelectionForeground(Colours.COLOR_4);
+        jScrollPane.getViewport().setBackground(Colours.COLOR_1);
+        toolBar.setBackground(Colours.COLOR_2);
+    }
+
+    private void initializeFrame() {
+        frame.add(toolBar, BorderLayout.WEST);
+        frame.add(jScrollPane, BorderLayout.CENTER);
+        frame.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(Icons.CURSOR.getImage(), new Point(0, 0), "img"));
+        frame.setVisible(true);
     }
 
     private String getFileName(VaultFile vaultFile) {
@@ -275,14 +246,6 @@ public class ProVaultFrame implements ActionListener {
         }
     }
 
-    private void updateVaultData() {
-        try {
-            VaultDataService.writeVaultData(vaultData);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
     private void deleteFile(int selectedRow) {
         if (selectedRow >= 0) {
             VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, FILE_NAME_COLUMN))).toList().get(0);
@@ -291,7 +254,7 @@ public class ProVaultFrame implements ActionListener {
                     "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, Icons.QUESTION_ICON);
             if (ret == 0) {
                 vaultData.getFiles().remove(vaultFile);
-                updateVaultData();
+                VaultDataService.writeVaultData(vaultData);
                 if (new File(Constant.VAULT_PATH + fileName).delete()) {
                     model.removeRow(selectedRow);
                 } else {
@@ -316,33 +279,8 @@ public class ProVaultFrame implements ActionListener {
         vaultFile.setLocked(true);
         vaultFile.setCategory(ProVaultUtil.getCategory(vaultData.getCategories()));
         vaultData.getFiles().add(vaultFile);
-        updateVaultData();
+        VaultDataService.writeVaultData(vaultData);
         File vFile = new File(Constant.VAULT_PATH + uuid);
-        model.addRow(new Object[]{getIcon(vaultFile), displayName, true, vaultFile.getCategory(), getStringSizeLengthFile(vFile.length()), uuid});
-    }
-
-    private ImageIcon getIcon(VaultFile file) {
-        String extension = file.getExtension().toLowerCase();
-        return switch (extension) {
-            case "png", "jpg", "jpeg", "bmp", "gif" -> Icons.PICTURE_ICON;
-            case "mp4", "mov", "wmv", "avi", "flv" -> Icons.VIDEO_ICON;
-            default -> Icons.DOCUMENT_ICON;
-        };
-    }
-
-    public static String getStringSizeLengthFile(long size) {
-        DecimalFormat df = new DecimalFormat(DECIMAL_PATTERN);
-        float sizeKb = 1024.0f;
-        float sizeMb = sizeKb * sizeKb;
-        float sizeGb = sizeMb * sizeKb;
-        float sizeTerra = sizeGb * sizeKb;
-        if (size < sizeMb)
-            return df.format(size / sizeKb) + " KB";
-        else if (size < sizeGb)
-            return df.format(size / sizeMb) + " MB";
-        else if (size < sizeTerra)
-            return df.format(size / sizeGb) + " GB";
-
-        return "";
+        model.addRow(new Object[]{ProVaultUtil.getIcon(vaultFile), displayName, true, vaultFile.getCategory(), ProVaultUtil.getStringSizeLengthFile(vFile.length()), uuid});
     }
 }

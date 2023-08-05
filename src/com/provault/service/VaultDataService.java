@@ -4,8 +4,13 @@ import com.provault.constants.Constant;
 import com.provault.model.VaultData;
 import com.provault.model.VaultFile;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class VaultDataService {
 
@@ -35,14 +40,18 @@ public class VaultDataService {
         return null;
     }
 
-    public static void writeVaultData(VaultData vaultData) throws Exception {
+    public static void writeVaultData(VaultData vaultData) {
         vaultData.getFiles().sort(Comparator.comparing(VaultFile::getDisplayName));
-        BufferedWriter bw = new BufferedWriter(new FileWriter(Constant.DATA_FILE, false));
-        List<VaultFile> files = vaultData.getFiles();
-        for(VaultFile file : files) {
-            bw.write(getString(file) + "\n");
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(Constant.DATA_FILE, false));
+            List<VaultFile> files = vaultData.getFiles();
+            for (VaultFile file : files) {
+                bw.write(getString(file) + "\n");
+            }
+            bw.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        bw.close();
     }
 
     private static VaultFile getVaultFile(String data) {

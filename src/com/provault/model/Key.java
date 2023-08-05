@@ -1,5 +1,4 @@
 package com.provault.model;
 
-public class Key {
-    public byte[] data;
+public record Key(byte[] data) {
 }

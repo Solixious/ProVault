@@ -1,7 +1,9 @@
 package com.provault.util;
 
 import com.provault.constants.Constant;
+import com.provault.constants.Icons;
 import com.provault.model.Key;
+import com.provault.model.VaultFile;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -9,6 +11,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 
 public class ProVaultUtil {
 
@@ -16,9 +19,7 @@ public class ProVaultUtil {
         byte[] bytes = md5.getBytes();
         byte[] keyData = new byte[16];
         System.arraycopy(bytes, 0, keyData, 0, 16);
-        Key key = new Key();
-        key.data = keyData;
-        return key;
+        return new Key(keyData);
     }
 
     public static void validateKey(File keyFile, String key) {
@@ -112,5 +113,30 @@ public class ProVaultUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String getStringSizeLengthFile(long size) {
+        DecimalFormat df = new DecimalFormat(Constant.DECIMAL_PATTERN);
+        float sizeKb = 1024.0f;
+        float sizeMb = sizeKb * sizeKb;
+        float sizeGb = sizeMb * sizeKb;
+        float sizeTerra = sizeGb * sizeKb;
+        if (size < sizeMb)
+            return df.format(size / sizeKb) + " KB";
+        else if (size < sizeGb)
+            return df.format(size / sizeMb) + " MB";
+        else if (size < sizeTerra)
+            return df.format(size / sizeGb) + " GB";
+
+        return "";
+    }
+
+    public static ImageIcon getIcon(VaultFile file) {
+        String extension = file.getExtension().toLowerCase();
+        return switch (extension) {
+            case "png", "jpg", "jpeg", "bmp", "gif" -> Icons.PICTURE_ICON;
+            case "mp4", "mov", "wmv", "avi", "flv" -> Icons.VIDEO_ICON;
+            default -> Icons.DOCUMENT_ICON;
+        };
     }
 }

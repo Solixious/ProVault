@@ -4,6 +4,10 @@ import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
 
+/**
+ * @author pratyush
+ * This interface is responsible for loading and maintaining all the icons used in the application's UI
+ */
 public interface Icons {
     ImageIcon ADD_ICON = ProVaultUtil.getIconAsResource("/img/add.png");
     ImageIcon CLOSE_ICON = ProVaultUtil.getIconAsResource("/img/close.png");
