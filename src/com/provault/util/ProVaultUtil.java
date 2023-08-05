@@ -7,8 +7,11 @@ import com.provault.model.VaultFile;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -138,5 +141,26 @@ public class ProVaultUtil {
             case "mp4", "mov", "wmv", "avi", "flv" -> Icons.VIDEO_ICON;
             default -> Icons.DOCUMENT_ICON;
         };
+    }
+
+    public static void openFile(String fileName) {
+        try {
+            Desktop.getDesktop().open(new File(fileName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void rename(String source, String newFileName) {
+        Path sourcePath = Paths.get(Constant.VAULT_PATH + source);
+        try {
+            Files.move(sourcePath, sourcePath.resolveSibling(newFileName));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static  String getFileName(VaultFile vaultFile) {
+        return vaultFile.isLocked() ? vaultFile.getFileName() : vaultFile.getDisplayName() + '.' + vaultFile.getExtension();
     }
 }

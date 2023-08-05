@@ -1,6 +1,7 @@
 package com.provault.gui;
 
 import com.provault.constants.Colours;
+import com.provault.constants.ColumnIndex;
 import com.provault.constants.Constant;
 import com.provault.constants.Icons;
 import com.provault.model.Key;
@@ -11,33 +12,19 @@ import com.provault.service.VaultDataService;
 import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class ProVaultFrame implements ActionListener {
+public class ProVaultFrame extends JFrame implements ActionListener {
 
-    private static final Integer ICON_COLUMN = 0;
-    private static final Integer DISPLAY_NAME_COLUMN = 1;
-    private static final Integer ENCRYPTED_STATUS_COLUMN = 2;
-    private static final Integer CATEGORY_COLUMN = 3;
-    private static final Integer FILE_SIZE_COLUMN = 4;
-    private static final Integer FILE_NAME_COLUMN = 5;
-
-    private JFrame frame;
     private JToolBar toolBar;
     private JButton addFile, deleteFile, close;
     private JTable vaultFilesList;
@@ -47,6 +34,7 @@ public class ProVaultFrame implements ActionListener {
     private final Key key;
 
     public ProVaultFrame(final VaultData vaultData, Key key) {
+        super(Constant.TITLE);
         this.vaultData = vaultData;
         this.key = key;
         initializeTable();
@@ -60,7 +48,7 @@ public class ProVaultFrame implements ActionListener {
         if (e.getSource() == addFile) {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setMultiSelectionEnabled(true);
-            int ret = fileChooser.showOpenDialog(frame);
+            int ret = fileChooser.showOpenDialog(this);
             if (ret == JFileChooser.APPROVE_OPTION) {
                 File[] files = fileChooser.getSelectedFiles();
                 for (File file : files) {
@@ -75,16 +63,15 @@ public class ProVaultFrame implements ActionListener {
                 deleteFile(selectedRow);
             }
         } else if (e.getSource() == close) {
-            frame.dispose();
+            dispose();
         }
     }
 
     private void initializeUIElements() {
-        frame = new JFrame(Constant.TITLE);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        frame.setIconImage(Icons.ICON.getImage());
-        frame.setUndecorated(true);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+        setIconImage(Icons.ICON.getImage());
+        setUndecorated(true);
 
         Taskbar taskbar = Taskbar.getTaskbar();
         taskbar.setIconImage(Icons.ICON.getImage());
@@ -104,24 +91,7 @@ public class ProVaultFrame implements ActionListener {
 
     private void initializeTable() {
         List<VaultFile> vaultFiles = vaultData.getFiles();
-        model = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return column == ENCRYPTED_STATUS_COLUMN
-                        || column == DISPLAY_NAME_COLUMN;
-            }
-        };
-        model.addColumn("Icon");
-        model.addColumn("File Name");
-        model.addColumn("Lock");
-        model.addColumn("Category");
-        model.addColumn("File Size");
-        model.addColumn("");
-        for (VaultFile vaultFile : vaultFiles) {
-            String fileName = getFileName(vaultFile);
-            File vFile = new File(Constant.VAULT_PATH + fileName);
-            model.addRow(new Object[]{ProVaultUtil.getIcon(vaultFile), vaultFile.getDisplayName(), vaultFile.isLocked(), vaultFile.getCategory(), ProVaultUtil.getStringSizeLengthFile(vFile.length()), vaultFile.getFileName()});
-        }
+        model = new ProVaultTableModel(vaultFiles);
         vaultFilesList = new ProVaultTable(model);
         vaultFilesList.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent mouseEvent) {
@@ -129,77 +99,42 @@ public class ProVaultFrame implements ActionListener {
                 Point point = mouseEvent.getPoint();
                 int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
-                    if ((Boolean) model.getValueAt(row, ENCRYPTED_STATUS_COLUMN)) {
+                    if ((Boolean) model.getValueAt(row, ColumnIndex.ENCRYPTED_STATUS_COLUMN)) {
                         return;
                     }
-                    VaultFile vaultFile = vaultFiles.stream().filter(e -> e.getFileName().equals(model.getValueAt(row, FILE_NAME_COLUMN))).toList().get(0);
-                    openFile(Constant.VAULT_PATH + vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
+                    VaultFile vaultFile = vaultFiles.stream().filter(e -> e.getFileName().equals(model.getValueAt(row, ColumnIndex.FILE_NAME_COLUMN))).toList().get(0);
+                    ProVaultUtil.openFile(Constant.VAULT_PATH + vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
                 }
             }
         });
-        vaultFilesList.getColumnModel().getColumn(ICON_COLUMN).setPreferredWidth(50);
-        vaultFilesList.getColumnModel().getColumn(DISPLAY_NAME_COLUMN).setPreferredWidth(300);
-        vaultFilesList.getColumnModel().getColumn(ENCRYPTED_STATUS_COLUMN).setPreferredWidth(42);
-        vaultFilesList.getColumnModel().getColumn(CATEGORY_COLUMN).setPreferredWidth(200);
-        vaultFilesList.getColumnModel().getColumn(FILE_SIZE_COLUMN).setPreferredWidth(200);
-        vaultFilesList.getColumnModel().getColumn(FILE_NAME_COLUMN).setPreferredWidth(0);
-        vaultFilesList.getColumnModel().removeColumn(vaultFilesList.getColumnModel().getColumn(FILE_NAME_COLUMN));
-
-        Font tableFont = new Font("Serif", Font.PLAIN, 16);
-        vaultFilesList.setFont(tableFont);
-
-        final DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-        final DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                setBorder(noFocusBorder);
-                return this;
-            }
-        };
-        renderer.setBackground(Colours.COLOR_2);
-        renderer.setForeground(Colours.COLOR_4);
-        vaultFilesList.getTableHeader().setDefaultRenderer(renderer);
-        vaultFilesList.setDefaultRenderer(String.class, cellRenderer);
-        vaultFilesList.getTableHeader().setBackground(Colours.COLOR_2);
-
-        DefaultCellEditor defaultCellEditor = (DefaultCellEditor) vaultFilesList.getDefaultEditor(Boolean.class);
-        JCheckBox checkBox = (JCheckBox) defaultCellEditor.getComponent();
-        checkBox.setIcon(Icons.UNLOCKED_ICON);
-        checkBox.setSelectedIcon(Icons.LOCKED_ICON);
-
-        TableCellRenderer tableCellRenderer = vaultFilesList.getDefaultRenderer(Boolean.class);
-        checkBox = (JCheckBox) tableCellRenderer;
-        checkBox.setIcon(Icons.UNLOCKED_ICON);
-        checkBox.setSelectedIcon(Icons.LOCKED_ICON);
 
         model.addTableModelListener(e -> {
             if (e.getFirstRow() >= model.getRowCount() || e.getFirstRow() < 0 || model.getRowCount() == 0 || e.getColumn() < 1) {
                 return;
             }
-            if (e.getColumn() == ENCRYPTED_STATUS_COLUMN) {
-                Boolean encrypted = (Boolean) model.getValueAt(e.getFirstRow(), ENCRYPTED_STATUS_COLUMN);
-                VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), FILE_NAME_COLUMN))).toList().get(0);
+            if (e.getColumn() == ColumnIndex.ENCRYPTED_STATUS_COLUMN) {
+                Boolean encrypted = (Boolean) model.getValueAt(e.getFirstRow(), ColumnIndex.ENCRYPTED_STATUS_COLUMN);
+                VaultFile vaultFile = vaultFiles.stream().filter(file -> file.getFileName().equals(model.getValueAt(e.getFirstRow(), ColumnIndex.FILE_NAME_COLUMN))).toList().get(0);
                 String fileName = !encrypted ? vaultFile.getFileName() : vaultFile.getDisplayName() + '.' + vaultFile.getExtension();
                 if (encrypted && !vaultFile.isLocked()) {
                     FileEncryptionService.encrypt(new File(Constant.VAULT_PATH + fileName), key);
-                    rename(fileName, vaultFile.getFileName());
+                    ProVaultUtil.rename(fileName, vaultFile.getFileName());
                     vaultFile.setLocked(true);
                     VaultDataService.writeVaultData(vaultData);
                 }
                 if (!encrypted && vaultFile.isLocked()) {
                     FileEncryptionService.decrypt(new File(Constant.VAULT_PATH + fileName), key);
-                    rename(fileName, vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
+                    ProVaultUtil.rename(fileName, vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
                     vaultFile.setLocked(false);
                     VaultDataService.writeVaultData(vaultData);
                 }
             }
-            if (e.getColumn() == DISPLAY_NAME_COLUMN) {
-                String updatedDisplayName = (String) model.getValueAt(e.getFirstRow(), DISPLAY_NAME_COLUMN);
-                String fileName = (String) model.getValueAt(e.getFirstRow(), FILE_NAME_COLUMN);
+            if (e.getColumn() == ColumnIndex.DISPLAY_NAME_COLUMN) {
+                String updatedDisplayName = (String) model.getValueAt(e.getFirstRow(), ColumnIndex.DISPLAY_NAME_COLUMN);
+                String fileName = (String) model.getValueAt(e.getFirstRow(), ColumnIndex.FILE_NAME_COLUMN);
                 VaultFile file = vaultData.getFiles().stream().filter(vaultFile -> vaultFile.getFileName().equals(fileName)).toList().get(0);
                 if (!file.isLocked()) {
-                    rename(file.getDisplayName() + "." + file.getExtension(), updatedDisplayName + "." + file.getExtension());
+                    ProVaultUtil.rename(file.getDisplayName() + "." + file.getExtension(), updatedDisplayName + "." + file.getExtension());
                 }
                 file.setDisplayName(updatedDisplayName);
                 VaultDataService.writeVaultData(vaultData);
@@ -219,46 +154,25 @@ public class ProVaultFrame implements ActionListener {
     }
 
     private void initializeFrame() {
-        frame.add(toolBar, BorderLayout.WEST);
-        frame.add(jScrollPane, BorderLayout.CENTER);
-        frame.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(Icons.CURSOR.getImage(), new Point(0, 0), "img"));
-        frame.setVisible(true);
+        add(toolBar, BorderLayout.WEST);
+        add(jScrollPane, BorderLayout.CENTER);
+        setCursor(Toolkit.getDefaultToolkit().createCustomCursor(Icons.CURSOR.getImage(), new Point(0, 0), "img"));
+        setVisible(true);
     }
 
-    private String getFileName(VaultFile vaultFile) {
-        return vaultFile.isLocked() ? vaultFile.getFileName() : vaultFile.getDisplayName() + '.' + vaultFile.getExtension();
-    }
-
-    private void rename(String source, String newFileName) {
-        Path sourcePath = Paths.get(Constant.VAULT_PATH + source);
-        try {
-            Files.move(sourcePath, sourcePath.resolveSibling(newFileName));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private void openFile(String fileName) {
-        try {
-            Desktop.getDesktop().open(new File(fileName));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void deleteFile(int selectedRow) {
         if (selectedRow >= 0) {
-            VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, FILE_NAME_COLUMN))).toList().get(0);
-            String fileName = getFileName(vaultFile);
-            int ret = JOptionPane.showConfirmDialog(frame,
-                    "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, Icons.QUESTION_ICON);
+            VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, ColumnIndex.FILE_NAME_COLUMN))).toList().get(0);
+            String fileName = ProVaultUtil.getFileName(vaultFile);
+            int ret = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, Icons.QUESTION_ICON);
             if (ret == 0) {
                 vaultData.getFiles().remove(vaultFile);
                 VaultDataService.writeVaultData(vaultData);
                 if (new File(Constant.VAULT_PATH + fileName).delete()) {
                     model.removeRow(selectedRow);
                 } else {
-                    JOptionPane.showConfirmDialog(frame, "File deletion failed", "File deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showConfirmDialog(this, "File deletion failed", "File deletion failed", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
