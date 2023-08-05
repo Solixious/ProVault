@@ -2,7 +2,6 @@ package com.provault.gui.listener;
 
 import com.provault.gui.ProVaultFrame;
 import com.provault.util.ProVaultUIUtil;
-import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

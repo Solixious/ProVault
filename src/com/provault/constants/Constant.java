@@ -17,4 +17,6 @@ public interface Constant {
     String DECIMAL_PATTERN = "0.00";
     String TITLE = "Pro Vault";
     Integer BUFFER_SIZE = 4096;
+    Integer ROW_HEIGHT = 36;
+    Integer FONT_SIZE = 16;
 }

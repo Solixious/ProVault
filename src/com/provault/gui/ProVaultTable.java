@@ -2,6 +2,7 @@ package com.provault.gui;
 
 import com.provault.constants.Colours;
 import com.provault.constants.ColumnIndex;
+import com.provault.constants.Constant;
 import com.provault.constants.Icons;
 
 import javax.swing.*;
@@ -14,7 +15,7 @@ public class ProVaultTable extends JTable {
     public ProVaultTable(DefaultTableModel model) {
         super(model);
         setAutoResizeMode(AUTO_RESIZE_OFF);
-        setRowHeight(36);
+        setRowHeight(Constant.ROW_HEIGHT);
         getTableHeader().setReorderingAllowed(false);
         getTableHeader().setResizingAllowed(false);
         getColumnModel().getColumn(ColumnIndex.ICON_COLUMN).setPreferredWidth(50);
@@ -24,7 +25,7 @@ public class ProVaultTable extends JTable {
         getColumnModel().getColumn(ColumnIndex.FILE_SIZE_COLUMN).setPreferredWidth(200);
         getColumnModel().getColumn(ColumnIndex.FILE_NAME_COLUMN).setPreferredWidth(0);
         getColumnModel().removeColumn(getColumnModel().getColumn(ColumnIndex.FILE_NAME_COLUMN));
-        Font tableFont = new Font("Serif", Font.PLAIN, 16);
+        Font tableFont = new Font("Serif", Font.PLAIN, Constant.FONT_SIZE);
         setFont(tableFont);
         final DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         final DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
