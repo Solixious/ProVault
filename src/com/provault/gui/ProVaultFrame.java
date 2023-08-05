@@ -18,7 +18,6 @@ import java.util.List;
 public class ProVaultFrame extends JFrame {
 
     private ProVaultToolBar toolBar;
-    private ProVaultButton addFile, deleteFile, close;
     private ProVaultTable vaultFilesList;
     private ProVaultTableModel model;
     private JScrollPane jScrollPane;
@@ -57,20 +56,15 @@ public class ProVaultFrame extends JFrame {
     }
 
     private void initializeUIElements() {
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
-        setIconImage(Icons.ICON.getImage());
-        setUndecorated(true);
-
         fileChooser = new JFileChooser();
         fileChooser.setMultiSelectionEnabled(true);
 
         Taskbar taskbar = Taskbar.getTaskbar();
         taskbar.setIconImage(Icons.ICON.getImage());
 
-        addFile = new ProVaultButton(Icons.ADD_ICON, new AddButtonActionListener(this), "Add file to vault");
-        deleteFile = new ProVaultButton(Icons.REMOVE_ICON, new DeleteButtonActionListener(this), "Delete file from vault");
-        close = new ProVaultButton(Icons.CLOSE_ICON, new ExitButtonActionListener(this), "Exit application");
+        ProVaultButton addFile = new ProVaultButton(Icons.ADD_ICON, new AddButtonActionListener(this), "Add file to vault");
+        ProVaultButton deleteFile = new ProVaultButton(Icons.REMOVE_ICON, new DeleteButtonActionListener(this), "Delete file from vault");
+        ProVaultButton close = new ProVaultButton(Icons.CLOSE_ICON, new ExitButtonActionListener(this), "Exit application");
 
         toolBar = new ProVaultToolBar();
         toolBar.add(addFile);
@@ -83,8 +77,8 @@ public class ProVaultFrame extends JFrame {
 
     private void initializeTable() {
         List<VaultFile> vaultFiles = vaultData.getFiles();
-        model = new ProVaultTableModel(vaultFiles);
         ProVaultTableListener tableListener = new ProVaultTableListener(this);
+        model = new ProVaultTableModel(vaultFiles);
         vaultFilesList = new ProVaultTable(model);
         vaultFilesList.addMouseListener(tableListener);
         model.addTableModelListener(tableListener);
@@ -102,9 +96,13 @@ public class ProVaultFrame extends JFrame {
     }
 
     private void initializeFrame() {
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+        setIconImage(Icons.ICON.getImage());
+        setCursor(Toolkit.getDefaultToolkit().createCustomCursor(Icons.CURSOR.getImage(), new Point(0, 0), "img"));
         add(toolBar, BorderLayout.WEST);
         add(jScrollPane, BorderLayout.CENTER);
-        setCursor(Toolkit.getDefaultToolkit().createCustomCursor(Icons.CURSOR.getImage(), new Point(0, 0), "img"));
+        setUndecorated(true);
         setVisible(true);
     }
 }

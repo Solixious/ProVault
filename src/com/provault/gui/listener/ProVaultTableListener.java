@@ -6,6 +6,7 @@ import com.provault.gui.ProVaultFrame;
 import com.provault.model.VaultFile;
 import com.provault.service.FileEncryptionService;
 import com.provault.service.VaultDataService;
+import com.provault.util.ProVaultUIUtil;
 import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
@@ -33,7 +34,7 @@ public class ProVaultTableListener extends MouseAdapter implements TableModelLis
                 return;
             }
             VaultFile vaultFile = proVaultFrame.getVaultData().getFiles().stream().filter(e -> e.getFileName().equals(proVaultFrame.getModel().getValueAt(row, ColumnIndex.FILE_NAME_COLUMN))).toList().get(0);
-            ProVaultUtil.openFile(Constant.VAULT_PATH + vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
+            ProVaultUIUtil.openFile(Constant.VAULT_PATH + vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
         }
     }
 

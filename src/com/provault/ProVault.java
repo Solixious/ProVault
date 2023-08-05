@@ -1,10 +1,9 @@
 package com.provault;
 
-import com.provault.constants.Colours;
 import com.provault.constants.Constant;
 import com.provault.gui.ProVaultFrame;
-import com.provault.model.VaultData;
 import com.provault.service.VaultDataService;
+import com.provault.util.ProVaultUIUtil;
 import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
@@ -14,18 +13,11 @@ public class ProVault {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            String key = ProVaultUtil.getKeyFromUser("Enter Password:");
-            String sha1 = ProVaultUtil.getHash(key, "sha1");
-            String md5 = ProVaultUtil.getHash(key, "md5");
-            File vaultFolder = new File(Constant.VAULT_PATH);
-            File dataFile = new File(Constant.DATA_FILE);
-            File keyFile = new File(Constant.KEY_FILE);
-            ProVaultUtil.createPathIfMissing(vaultFolder, dataFile);
-            ProVaultUtil.validateKey(keyFile, sha1);
-            VaultData vaultData = VaultDataService.generateVaultData();
-            UIManager.put("ToolTip.background", Colours.COLOR_3);
-            UIManager.put("ToolTip.foreground", Colours.COLOR_4);
-            new ProVaultFrame(vaultData, ProVaultUtil.get16Bytes(md5));
+            ProVaultUIUtil.initializeUIManager();
+            String key = ProVaultUIUtil.getKeyFromUser("Enter Password:");
+            ProVaultUtil.createPathIfMissing(new File(Constant.VAULT_PATH), new File(Constant.DATA_FILE));
+            ProVaultUtil.validateKey(new File(Constant.KEY_FILE), ProVaultUtil.getHash(key, "sha1"));
+            new ProVaultFrame(VaultDataService.generateVaultData(), ProVaultUtil.get16Bytes(ProVaultUtil.getHash(key, "md5")));
         });
     }
 }

@@ -13,6 +13,7 @@ public interface Icons {
     ImageIcon CLOSE_ICON = ProVaultUtil.getIconAsResource("/img/close.png");
     ImageIcon ICON = ProVaultUtil.getIconAsResource("/img/icon.png");
     ImageIcon LOCKED_ICON = ProVaultUtil.getIconAsResource("/img/locked.png");
+    ImageIcon LOCK_ICON = ProVaultUtil.getIconAsResource("/img/lock.png");
     ImageIcon QUESTION_ICON = ProVaultUtil.getIconAsResource("/img/question.png");
     ImageIcon REMOVE_ICON = ProVaultUtil.getIconAsResource("/img/remove.png");
     ImageIcon UNLOCKED_ICON = ProVaultUtil.getIconAsResource("/img/unlocked.png");

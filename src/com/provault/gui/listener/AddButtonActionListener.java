@@ -1,6 +1,7 @@
 package com.provault.gui.listener;
 
 import com.provault.gui.ProVaultFrame;
+import com.provault.util.ProVaultUIUtil;
 import com.provault.util.ProVaultUtil;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class AddButtonActionListener implements ActionListener {
         if (ret == JFileChooser.APPROVE_OPTION) {
             File[] files = proVaultFrame.getFileChooser().getSelectedFiles();
             for (File file : files) {
-                ProVaultUtil.addFile(file, proVaultFrame.getKey(), proVaultFrame.getVaultData(), proVaultFrame.getModel());
+                ProVaultUIUtil.addFile(file, proVaultFrame.getKey(), proVaultFrame.getVaultData(), proVaultFrame.getModel());
             }
         }
     }

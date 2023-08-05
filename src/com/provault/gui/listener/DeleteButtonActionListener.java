@@ -1,6 +1,7 @@
 package com.provault.gui.listener;
 
 import com.provault.gui.ProVaultFrame;
+import com.provault.util.ProVaultUIUtil;
 import com.provault.util.ProVaultUtil;
 
 import java.awt.event.ActionEvent;
@@ -21,7 +22,7 @@ public class DeleteButtonActionListener implements ActionListener {
         Arrays.sort(selectedRows);
         for (int i = selectedRows.length - 1; i >= 0; i--) {
             int selectedRow = selectedRows[i];
-            ProVaultUtil.deleteFile(selectedRow, proVaultFrame.getVaultData(), proVaultFrame.getModel(), proVaultFrame);
+            ProVaultUIUtil.deleteFile(selectedRow, proVaultFrame.getVaultData(), proVaultFrame.getModel(), proVaultFrame);
         }
     }
 }
