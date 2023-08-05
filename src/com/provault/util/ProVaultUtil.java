@@ -106,7 +106,7 @@ public class ProVaultUtil {
         String extension = file.getExtension().toLowerCase();
         return switch (extension) {
             case "png", "jpg", "jpeg", "bmp", "gif" -> Icons.PICTURE_ICON;
-            case "mp4", "mov", "wmv", "avi", "flv" -> Icons.VIDEO_ICON;
+            case "mp4", "mov", "wmv", "avi", "flv", "mpeg", "mkv", "webm", "3gp" -> Icons.VIDEO_ICON;
             default -> Icons.DOCUMENT_ICON;
         };
     }
