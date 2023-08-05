@@ -1,6 +1,8 @@
 package com.provault.gui;
 
+import com.provault.constants.Colours;
 import com.provault.constants.Constant;
+import com.provault.constants.Icons;
 import com.provault.model.Key;
 import com.provault.model.VaultData;
 import com.provault.model.VaultFile;
@@ -58,18 +60,18 @@ public class ProVaultFrame implements ActionListener {
         JScrollPane jScrollPane = new JScrollPane(vaultFilesList);
         jScrollPane.setBorder(emptyBorder);
 
-        vaultFilesList.setBackground(Constant.COLOR_1);
-        vaultFilesList.setForeground(Constant.COLOR_4);
+        vaultFilesList.setBackground(Colours.COLOR_1);
+        vaultFilesList.setForeground(Colours.COLOR_4);
         vaultFilesList.setShowHorizontalLines(false);
         vaultFilesList.setShowVerticalLines(false);
-        vaultFilesList.setSelectionBackground(Constant.COLOR_3);
-        vaultFilesList.setSelectionForeground(Constant.COLOR_4);
-        jScrollPane.getViewport().setBackground(Constant.COLOR_1);
-        toolBar.setBackground(Constant.COLOR_2);
+        vaultFilesList.setSelectionBackground(Colours.COLOR_3);
+        vaultFilesList.setSelectionForeground(Colours.COLOR_4);
+        jScrollPane.getViewport().setBackground(Colours.COLOR_1);
+        toolBar.setBackground(Colours.COLOR_2);
 
         frame.add(toolBar, BorderLayout.WEST);
         frame.add(jScrollPane, BorderLayout.CENTER);
-        frame.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(Constant.CURSOR.getImage(), new Point(0, 0), "img"));
+        frame.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(Icons.CURSOR.getImage(), new Point(0, 0), "img"));
         frame.setVisible(true);
     }
 
@@ -77,22 +79,22 @@ public class ProVaultFrame implements ActionListener {
         frame = new JFrame(TITLE);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        frame.setIconImage(Constant.ICON.getImage());
+        frame.setIconImage(Icons.ICON.getImage());
         frame.setUndecorated(true);
 
         Taskbar taskbar = Taskbar.getTaskbar();
-        taskbar.setIconImage(Constant.ICON.getImage());
+        taskbar.setIconImage(Icons.ICON.getImage());
 
 
-        addFile = new JButton(Constant.ADD_ICON);
+        addFile = new JButton(Icons.ADD_ICON);
         addFile.addActionListener(this);
         addFile.setBorder(emptyBorder);
         addFile.setToolTipText("Add file to vault");
-        deleteFile = new JButton(Constant.REMOVE_ICON);
+        deleteFile = new JButton(Icons.REMOVE_ICON);
         deleteFile.addActionListener(this);
         deleteFile.setBorder(emptyBorder);
         deleteFile.setToolTipText("Delete file from vault");
-        close = new JButton(Constant.CLOSE_ICON);
+        close = new JButton(Icons.CLOSE_ICON);
         close.addActionListener(this);
         close.setBorder(emptyBorder);
         close.setToolTipText("Exit application");
@@ -202,21 +204,21 @@ public class ProVaultFrame implements ActionListener {
                 return this;
             }
         };
-        renderer.setBackground(Constant.COLOR_2);
-        renderer.setForeground(Constant.COLOR_4);
+        renderer.setBackground(Colours.COLOR_2);
+        renderer.setForeground(Colours.COLOR_4);
         vaultFilesList.getTableHeader().setDefaultRenderer(renderer);
         vaultFilesList.setDefaultRenderer(String.class, cellRenderer);
-        vaultFilesList.getTableHeader().setBackground(Constant.COLOR_2);
+        vaultFilesList.getTableHeader().setBackground(Colours.COLOR_2);
 
         DefaultCellEditor defaultCellEditor = (DefaultCellEditor) vaultFilesList.getDefaultEditor(Boolean.class);
         JCheckBox checkBox = (JCheckBox) defaultCellEditor.getComponent();
-        checkBox.setIcon(Constant.UNLOCKED_ICON);
-        checkBox.setSelectedIcon(Constant.LOCKED_ICON);
+        checkBox.setIcon(Icons.UNLOCKED_ICON);
+        checkBox.setSelectedIcon(Icons.LOCKED_ICON);
 
         TableCellRenderer tableCellRenderer = vaultFilesList.getDefaultRenderer(Boolean.class);
         checkBox = (JCheckBox) tableCellRenderer;
-        checkBox.setIcon(Constant.UNLOCKED_ICON);
-        checkBox.setSelectedIcon(Constant.LOCKED_ICON);
+        checkBox.setIcon(Icons.UNLOCKED_ICON);
+        checkBox.setSelectedIcon(Icons.LOCKED_ICON);
 
         model.addTableModelListener(e -> {
             if (e.getFirstRow() >= model.getRowCount() || e.getFirstRow() < 0 || model.getRowCount() == 0 || e.getColumn() < 1) {
@@ -286,7 +288,7 @@ public class ProVaultFrame implements ActionListener {
             VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, FILE_NAME_COLUMN))).toList().get(0);
             String fileName = getFileName(vaultFile);
             int ret = JOptionPane.showConfirmDialog(frame,
-                    "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, Constant.QUESTION_ICON);
+                    "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, Icons.QUESTION_ICON);
             if (ret == 0) {
                 vaultData.getFiles().remove(vaultFile);
                 updateVaultData();
@@ -322,9 +324,9 @@ public class ProVaultFrame implements ActionListener {
     private ImageIcon getIcon(VaultFile file) {
         String extension = file.getExtension().toLowerCase();
         return switch (extension) {
-            case "png", "jpg", "jpeg", "bmp", "gif" -> Constant.PICTURE_ICON;
-            case "mp4", "mov", "wmv", "avi", "flv" -> Constant.VIDEO_ICON;
-            default -> Constant.DOCUMENT_ICON;
+            case "png", "jpg", "jpeg", "bmp", "gif" -> Icons.PICTURE_ICON;
+            case "mp4", "mov", "wmv", "avi", "flv" -> Icons.VIDEO_ICON;
+            default -> Icons.DOCUMENT_ICON;
         };
     }
 

@@ -1,5 +1,6 @@
 package com.provault;
 
+import com.provault.constants.Colours;
 import com.provault.constants.Constant;
 import com.provault.gui.ProVaultFrame;
 import com.provault.model.VaultData;
@@ -22,8 +23,8 @@ public class ProVault {
             ProVaultUtil.createPathIfMissing(vaultFolder, dataFile);
             ProVaultUtil.validateKey(keyFile, sha1);
             VaultData vaultData = VaultDataService.generateVaultData();
-            UIManager.put("ToolTip.background", Constant.COLOR_3);
-            UIManager.put("ToolTip.foreground", Constant.COLOR_4);
+            UIManager.put("ToolTip.background", Colours.COLOR_3);
+            UIManager.put("ToolTip.foreground", Colours.COLOR_4);
             new ProVaultFrame(vaultData, ProVaultUtil.get16Bytes(md5));
         });
     }
