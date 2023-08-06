@@ -1,5 +1,7 @@
 package com.provault.gui;
 
+import com.provault.constants.Colours;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.event.ActionListener;
@@ -13,5 +15,6 @@ public class ProVaultButton extends JButton {
         addActionListener(actionListener);
         setBorder(EMPTY_BORDER);
         setToolTipText(toolTipText);
+        setBackground(Colours.COLOR_2);
     }
 }
