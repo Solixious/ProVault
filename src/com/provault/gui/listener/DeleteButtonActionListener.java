@@ -22,7 +22,7 @@ public class DeleteButtonActionListener implements ActionListener {
         Arrays.sort(selectedRows);
         for (int i = selectedRows.length - 1; i >= 0; i--) {
             int selectedRow = selectedRows[i];
-            ProVaultUIUtil.deleteFile(selectedRow, proVaultFrame.getVaultData(), proVaultFrame.getModel(), proVaultFrame);
+            ProVaultUIUtil.deleteFile(selectedRow, proVaultFrame.getVaultData(), proVaultFrame.getModel(), proVaultFrame, proVaultFrame.getKey());
         }
     }
 }

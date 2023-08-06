@@ -51,13 +51,13 @@ public class ProVaultTableListener extends MouseAdapter implements TableModelLis
                 FileEncryptionService.encrypt(new File(Constant.VAULT_PATH + fileName), proVaultFrame.getKey());
                 ProVaultUtil.rename(fileName, vaultFile.getFileName());
                 vaultFile.setLocked(true);
-                VaultDataService.writeVaultData(proVaultFrame.getVaultData());
+                VaultDataService.writeVaultData(proVaultFrame.getVaultData(), proVaultFrame.getKey());
             }
             if (!encrypted && vaultFile.isLocked()) {
                 FileEncryptionService.decrypt(new File(Constant.VAULT_PATH + fileName), proVaultFrame.getKey());
                 ProVaultUtil.rename(fileName, vaultFile.getDisplayName() + '.' + vaultFile.getExtension());
                 vaultFile.setLocked(false);
-                VaultDataService.writeVaultData(proVaultFrame.getVaultData());
+                VaultDataService.writeVaultData(proVaultFrame.getVaultData(), proVaultFrame.getKey());
             }
         }
         if (e.getColumn() == ColumnIndex.DISPLAY_NAME_COLUMN) {
@@ -68,7 +68,7 @@ public class ProVaultTableListener extends MouseAdapter implements TableModelLis
                 ProVaultUtil.rename(file.getDisplayName() + "." + file.getExtension(), updatedDisplayName + "." + file.getExtension());
             }
             file.setDisplayName(updatedDisplayName);
-            VaultDataService.writeVaultData(proVaultFrame.getVaultData());
+            VaultDataService.writeVaultData(proVaultFrame.getVaultData(), proVaultFrame.getKey());
         }
     }
 }

@@ -4,6 +4,7 @@ import com.provault.constants.Constant;
 import com.provault.constants.Icons;
 import com.provault.model.Key;
 import com.provault.model.VaultFile;
+import com.provault.service.FileEncryptionService;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -46,7 +47,7 @@ public class ProVaultUtil {
         }
     }
 
-    public static void createPathIfMissing(File vaultFolder, File dataFile) {
+    public static void createPathIfMissing(File vaultFolder, File dataFile, Key key) {
         try {
             if (!vaultFolder.exists()) {
                 Files.createDirectory(vaultFolder.toPath());
@@ -58,6 +59,7 @@ public class ProVaultUtil {
                     log("Error creating data file...");
                 }
                 log("Creating data file.");
+                FileEncryptionService.encrypt(new File(Constant.DATA_FILE), key);
             }
         } catch (Exception e) {
             e.printStackTrace();

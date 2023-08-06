@@ -69,19 +69,19 @@ public class ProVaultUIUtil {
         vaultFile.setLocked(true);
         vaultFile.setCategory(ProVaultUIUtil.getCategory(vaultData.getCategories()));
         vaultData.getFiles().add(vaultFile);
-        VaultDataService.writeVaultData(vaultData);
+        VaultDataService.writeVaultData(vaultData, key);
         File vFile = new File(Constant.VAULT_PATH + uuid);
         model.addRow(new Object[]{ProVaultUtil.getIcon(vaultFile), displayName, true, vaultFile.getCategory(), ProVaultUtil.getStringSizeLengthFile(vFile.length()), uuid});
     }
 
-    public static void deleteFile(int selectedRow, VaultData vaultData, ProVaultTableModel model, ProVaultFrame frame) {
+    public static void deleteFile(int selectedRow, VaultData vaultData, ProVaultTableModel model, ProVaultFrame frame, Key key) {
         if (selectedRow >= 0) {
             VaultFile vaultFile = vaultData.getFiles().stream().filter(file -> file.getFileName().equals(model.getValueAt(selectedRow, ColumnIndex.FILE_NAME_COLUMN))).toList().get(0);
             String fileName = ProVaultUtil.getFileName(vaultFile);
             int ret = JOptionPane.showConfirmDialog(frame, "Are you sure you want to delete " + vaultFile.getDisplayName() + "?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, Icons.QUESTION_ICON);
             if (ret == 0) {
                 vaultData.getFiles().remove(vaultFile);
-                VaultDataService.writeVaultData(vaultData);
+                VaultDataService.writeVaultData(vaultData, key);
                 if (new File(Constant.VAULT_PATH + fileName).delete()) {
                     model.removeRow(selectedRow);
                 } else {

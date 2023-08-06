@@ -1,13 +1,11 @@
 package com.provault.service;
 
 import com.provault.constants.Constant;
+import com.provault.model.Key;
 import com.provault.model.VaultData;
 import com.provault.model.VaultFile;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -18,9 +16,11 @@ public class VaultDataService {
     public static final String TRUE = "1";
     public static final String FALSE = "0";
 
-    public static VaultData generateVaultData() {
+    public static VaultData generateVaultData(Key key) {
         try {
-            BufferedReader br = new BufferedReader(new FileReader(Constant.DATA_FILE));
+            File dataFile = new File(Constant.DATA_FILE);
+            FileEncryptionService.decrypt(dataFile, key);
+            BufferedReader br = new BufferedReader(new FileReader(dataFile));
             VaultData vaultData = new VaultData();
             List<VaultFile> files = new ArrayList<>();
             vaultData.setFiles(files);
@@ -32,6 +32,7 @@ public class VaultDataService {
                 VaultFile vaultFile = getVaultFile(data);
                 files.add(vaultFile);
             }
+            FileEncryptionService.encrypt(dataFile, key);
             files.sort(Comparator.comparing(VaultFile::getCategory).thenComparing(VaultFile::getDisplayName));
             return vaultData;
         } catch (Exception e) {
@@ -40,15 +41,17 @@ public class VaultDataService {
         return null;
     }
 
-    public static void writeVaultData(VaultData vaultData) {
+    public static void writeVaultData(VaultData vaultData, Key key) {
         vaultData.getFiles().sort(Comparator.comparing(VaultFile::getDisplayName));
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(Constant.DATA_FILE, false));
+            File dataFile = new File(Constant.DATA_FILE);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(dataFile, false));
             List<VaultFile> files = vaultData.getFiles();
             for (VaultFile file : files) {
                 bw.write(getString(file) + "\n");
             }
             bw.close();
+            FileEncryptionService.encrypt(dataFile, key);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
