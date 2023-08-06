@@ -22,13 +22,13 @@ public class ProVaultUIUtil {
 
     public static String getKeyFromUser(String text) {
         JPanel panel = new JPanel();
+        panel.setLayout(Constant.OPTION_PANE_GRID_LAYOUT);
         JLabel label = new JLabel(text);
         JPasswordField pass = new JPasswordField(16);
-        panel.add(new JLabel(Icons.LOCK_ICON));
         panel.add(label);
         panel.add(pass);
         String[] options = new String[]{"OK", "Cancel"};
-        int option = JOptionPane.showOptionDialog(null, panel, text, JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+        int option = JOptionPane.showOptionDialog(null, panel, text, JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, Icons.LOCK_ICON, options, options[0]);
         if (option == 0) {
             char[] password = pass.getPassword();
             if (password.length < 4) System.exit(0);
@@ -39,10 +39,14 @@ public class ProVaultUIUtil {
         return "";
     }
 
-    public static String getCategory(Object[] categories) {
+    public static String getCategory(Object[] categories, String displayName) {
+        JPanel panel = new JPanel();
+        panel.setLayout(Constant.OPTION_PANE_GRID_LAYOUT);
         JComboBox<Object> comboBox = new JComboBox<>(categories);
         comboBox.setEditable(true);
-        JOptionPane.showMessageDialog(null, comboBox, "Category", JOptionPane.QUESTION_MESSAGE);
+        panel.add(new JLabel(displayName + "'s Category?"));
+        panel.add(comboBox);
+        JOptionPane.showMessageDialog(null, panel, "Category", JOptionPane.QUESTION_MESSAGE, Icons.QUESTION_ICON);
         return (String) comboBox.getSelectedItem();
     }
 
@@ -67,7 +71,7 @@ public class ProVaultUIUtil {
         vaultFile.setDisplayName(displayName);
         vaultFile.setExtension(extension);
         vaultFile.setLocked(true);
-        vaultFile.setCategory(ProVaultUIUtil.getCategory(vaultData.getCategories()));
+        vaultFile.setCategory(ProVaultUIUtil.getCategory(vaultData.getCategories(), displayName));
         vaultData.getFiles().add(vaultFile);
         VaultDataService.writeVaultData(vaultData, key);
         File vFile = new File(Constant.VAULT_PATH + uuid);

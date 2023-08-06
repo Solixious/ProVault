@@ -1,6 +1,7 @@
 package com.provault.constants;
 
 import javax.swing.filechooser.FileSystemView;
+import java.awt.*;
 import java.io.File;
 
 /**
@@ -19,4 +20,5 @@ public interface Constant {
     Integer BUFFER_SIZE = 4096;
     Integer ROW_HEIGHT = 36;
     Integer FONT_SIZE = 16;
+    GridLayout OPTION_PANE_GRID_LAYOUT = new GridLayout(2, 1);
 }
